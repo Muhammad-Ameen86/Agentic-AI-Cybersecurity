@@ -4,4 +4,4 @@ app = FastAPI()
 
 @app.get("/")
 def home():
-    return {"status": "HF is working 🚀"}
+    return {"status": "WORKING"}
