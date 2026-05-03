@@ -1,12 +1,7 @@
-import os
-from flask import Flask
+from fastapi import FastAPI
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/")
+@app.get("/")
 def home():
-    return "Sentinel AI is running 🚀"
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 7860))
-    app.run(host="0.0.0.0", port=port)
+    return {"status": "HF is working 🚀"}
