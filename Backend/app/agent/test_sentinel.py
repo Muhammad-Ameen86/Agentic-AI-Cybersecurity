@@ -14,7 +14,7 @@ import time
 import sys
 from datetime import datetime
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = self.mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 
 # ── Colors for terminal output ──
 GREEN  = "\033[92m"

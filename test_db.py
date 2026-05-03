@@ -1,20 +1,22 @@
-from Backend.app.agent.long_term_memory import LongTermMemory
+import os
+from pymongo import MongoClient
 
-# Initialize your memory module
-memory = LongTermMemory()
+# Get Mongo URI from environment
+MONGO_URI = os.getenv("MONGO_URI")
 
-# Simulate an AI Agent blocking a malicious IP
-success = memory.log_decision(
-    srcip="192.168.1.100",
-    model="RandomForest_v1",
-    prediction="Attack",
-    confidence=0.99,
-    decision="BLOCK",
-    reason="Agentic reasoning: Repeated failed login attempts + matching DDoS signature.",
-    raw_data={"packet_count": 500, "protocol": "TCP"}
-)
+if not MONGO_URI:
+    print("❌ MONGO_URI not found in environment")
+    exit()
 
-if success:
-    print("✅ Success! Your 'The_Sentinel' database will now appear in Atlas.")
-else:
-    print("❌ Failed. Check your MONGO_URI and Network Access settings.")
+try:
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    db = client.get_database("The_Sentinel")
+
+    # Test connection
+    client.admin.command("ping")
+
+    print("✅ MongoDB Atlas connected successfully!")
+
+except Exception as e:
+    print("❌ MongoDB connection failed:")
+    print(e)
