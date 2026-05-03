@@ -1,0 +1,22 @@
+{
+  "policy_version": "2.0",
+
+  "thresholds": {
+    "allow":   0.0,
+    "monitor": 0.4,
+    "alert":   0.6,
+    "block":   0.8
+  },
+
+  "risk_weights": {
+    "confidence":       0.6,
+    "attack_frequency": 0.25,
+    "block_history":    0.15
+  },
+
+  "governance_rules": {
+    "repeat_attack_limit":      2,
+    "max_blocks_before_strict": 3,
+    "burst_threshold":          100
+  }
+}

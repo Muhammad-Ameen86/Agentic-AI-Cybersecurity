@@ -1,0 +1,61 @@
+=============================================================
+   THE SENTINEL — SOC COMMAND CENTER (v3.0)
+   Project Documentation & Component Overview
+=============================================================
+
+1. PROJECT SUMMARY
+------------------
+The Sentinel is a state-of-the-art Autonomous SOC Command Center 
+designed for real-time intrusion detection and automated threat 
+mitigation. It leverages "Agentic AI" (LangChain/LangGraph) to 
+execute proportionate cybersecurity responses based on ML 
+predictions and behavioral context.
+
+2. TECHNOLOGY STACK
+-------------------
+- BACKEND: FastAPI (Python 3.10+)
+- DATABASE: MongoDB (Long-term Memory & Decision Logs)
+- AI AGENT: LangChain & LangGraph (ReAct Logic)
+- MODELS: 
+  * ML: Random Forest, XGBoost, Logistic Regression (Scikit-Learn)
+  * LLM: Claude 3.7 (Anthropic), Gemini 3 Pro (Google), Llama 4 (Groq)
+- FRONTEND: Vanilla HTML5, CSS3 (Premium Glassmorphism), JavaScript (ES6)
+
+3. KEY FEATURES
+---------------
+- AUTONOMOUS DECISION ENGINE: 
+  * A LangGraph-powered agent that uses tools to analyze IP history, 
+    assess ML confidence, and detect escalation patterns.
+- REAL-TIME TRAFFIC SIMULATOR:
+  * Deployable agent roles: DPI (Deep Packet Inspection), DDoS, 
+    Auth (Brute Force), Recon (Scanning), and Monitor (Benign).
+- BENTO DASHBOARD:
+  * High-fidelity metrics for Total Requests, Unique IPs, 
+    Active Threats, Agent Health, and Inference Latency.
+- DATA RETENTION POLICY:
+  * User-configurable log retention (3h, 8h, 24h, 1d) with 
+    automated MongoDB purging.
+- HOT-SWAPPABLE AI CORE:
+  * Instant runtime switching between LLM providers (Google, 
+    Anthropic, Groq) via the Settings UI.
+- LOG ARCHIVES & BEHAVIORAL ANALYSIS:
+  * Deep-dive behavior analysis for every source IP, including 
+    escalation trends and prior block history.
+
+4. SYSTEM ARCHITECTURE
+----------------------
+- /Backend/app/api: RESTful endpoints for real-time operations.
+- /Backend/app/agent: The "Brain" (Short-term memory, Tools, LLM config).
+- /Backend/app/core: Model registry and policy management.
+- /stitch_exports: Premium frontend screens (Dashboard, Logs, Settings).
+- /Data: Local datasets (UNSW-NB15, CIC-IDS-2017) for simulation.
+
+5. SECURITY PROTOCOLS
+---------------------
+- Role-based deployment (Standard/Strict/Escalation).
+- Dynamic risk thresholds and multi-model consensus.
+- Automated session timeouts and secure credential management.
+
+=============================================================
+   SENTINEL — "Defending the Perimeter at the Speed of Thought"
+=============================================================

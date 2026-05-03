@@ -1,0 +1,50 @@
+{
+    "random_forest": {
+        "display_name": "Random Forest",
+        "dataset": "CIC-IDS-2017",
+        "metrics": {
+            "accuracy": 0.9988,
+            "precision": 0.9971,
+            "recall": 0.9953,
+            "f1": 0.9962
+        },
+        "confusion_matrix": {
+            "tn": 364732,
+            "fp": 196,
+            "fn": 317,
+            "tp": 66555
+        }
+    },
+    "xgboost": {
+        "display_name": "XGBoost",
+        "dataset": "CIC-IDS-2017",
+        "metrics": {
+            "accuracy": 0.9992,
+            "precision": 0.9976,
+            "recall": 0.9974,
+            "f1": 0.9975
+        },
+        "confusion_matrix": {
+            "tn": 364765,
+            "fp": 163,
+            "fn": 176,
+            "tp": 66696
+        }
+    },
+    "logistic_regression": {
+        "display_name": "Logistic Regression",
+        "dataset": "CIC-IDS-2017",
+        "metrics": {
+            "accuracy": 0.9721,
+            "precision": 0.9653,
+            "recall": 0.8506,
+            "f1": 0.9043
+        },
+        "confusion_matrix": {
+            "tn": 362881,
+            "fp": 2047,
+            "fn": 9993,
+            "tp": 56879
+        }
+    }
+}

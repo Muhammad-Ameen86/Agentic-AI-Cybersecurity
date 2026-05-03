@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentinel — Complete Log Archives</title>
+    <meta name="description" content="Full network packet log archive with real-time intrusion event history" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { headline: ['Inter', 'sans-serif'], body: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+              "on-primary-container": "#002f35",
+              "outline-variant": "#414754",
+              "on-secondary": "#19324b",
+              "secondary": "#b0c9e8",
+              "on-secondary-fixed": "#011d35",
+              "surface-container-high": "#222a3d",
+              "secondary-fixed-dim": "#b0c9e8",
+              "surface-dim": "#0b1326",
+              "surface-container-highest": "#2d3449",
+              "surface-container-lowest": "#060e20",
+              "outline": "#8b90a0",
+              "primary-fixed": "#9cf0ff",
+              "on-tertiary-container": "#00311d",
+              "surface-container": "#171f33",
+              "primary-container": "#009fb2",
+              "secondary-fixed": "#d1e4ff",
+              "on-primary-fixed-variant": "#004f58",
+              "surface-tint": "#00daf3",
+              "tertiary-fixed": "#4dffb2",
+              "background": "#0b1326",
+              "secondary-container": "#314863",
+              "inverse-primary": "#006875",
+              "tertiary-container": "#00a56d",
+              "tertiary": "#00e297",
+              "primary-fixed-dim": "#00daf3",
+              "on-primary": "#00363d",
+              "inverse-on-surface": "#283044",
+              "tertiary-fixed-dim": "#00e297",
+              "on-error-container": "#ffdad6",
+              "on-error": "#690005",
+              "surface-container-low": "#131b2e",
+              "on-secondary-container": "#9fb7d6",
+              "surface-bright": "#31394d",
+              "on-primary-fixed": "#001f24",
+              "on-tertiary-fixed-variant": "#005234",
+              "surface": "#0b1326",
+              "on-surface": "#dae2fd",
+              "on-tertiary-fixed": "#002112",
+              "error": "#ffb4ab",
+              "primary": "#00daf3",
+              "error-container": "#93000a",
+              "on-tertiary": "#003822",
+              "surface-variant": "#2d3449",
+              "on-surface-variant": "#c1c6d7",
+              "on-secondary-fixed-variant": "#314863",
+              "on-background": "#dae2fd",
+              "inverse-surface": "#dae2fd"
+            }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { background: #080f1e; color: #dae2fd; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(13,22,40,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(65,71,84,0.3); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0d1628; }
+        ::-webkit-scrollbar-thumb { background: #41475480; border-radius: 3px; }
+        .decision-BLOCK   { color: #ffb4ab; background: rgba(255,180,171,0.1); border-color: rgba(255,180,171,0.4); }
+        .decision-ALERT   { color: #fbbf24; background: rgba(251,191,36,0.1);  border-color: rgba(251,191,36,0.4); }
+        .decision-MONITOR { color: #00daf3; background: rgba(0,218,243,0.1);   border-color: rgba(0,218,243,0.4); }
+        .decision-ALLOW   { color: #00e297; background: rgba(0,226,151,0.1);   border-color: rgba(0,226,151,0.4); }
+        @keyframes fadeSlideIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+        .new-row { animation: fadeSlideIn 0.35s ease; }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <!-- ── HEADER ───────────────────────────────────────────────── -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-outline-variant/30 px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <a href="dashboard.html" class="flex items-center gap-2 text-sm text-secondary hover:text-white transition-colors group">
+                <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">arrow_back</span>
+                Back to Dashboard
+            </a>
+            <div class="h-4 w-px bg-outline-variant/40"></div>
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-xl">policy</span>
+                <h1 class="text-lg font-bold font-headline">Complete Log Archives</h1>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <!-- Live indicator -->
+            <div class="flex items-center gap-2 bg-surface px-3 py-1.5 rounded-full border border-outline-variant/30">
+                <span class="relative flex h-2 w-2">
+                    <span id="live-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span>
+                    <span id="live-dot" class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+                </span>
+                <span id="live-text" class="text-[10px] uppercase tracking-wider text-tertiary font-bold">Auto-refresh 15s</span>
+            </div>
+            <!-- Record count -->
+            <div class="bg-surface px-3 py-1.5 rounded-full border border-outline-variant/30 text-[11px] font-mono text-secondary">
+                <span id="record-count">—</span> records
+            </div>
+            <!-- Export -->
+            <button onclick="exportCSV()" class="flex items-center gap-1.5 text-xs bg-primary/20 text-primary px-4 py-2 rounded-lg border border-primary/40 hover:bg-primary/40 hover:shadow-[0_0_12px_rgba(0,218,243,0.2)] transition-all">
+                <span class="material-symbols-outlined text-[14px]">download</span>
+                Export CSV
+            </button>
+        </div>
+    </header>
+
+    <!-- ── STATS BAR ─────────────────────────────────────────────── -->
+    <div class="px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-3 max-w-screen-2xl mx-auto">
+        <div class="glass-panel rounded-xl p-4 flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-2xl">hub</span>
+            <div><p class="text-[10px] uppercase text-secondary/60 font-bold tracking-widest">Total Events</p><p id="stat-total" class="text-2xl font-bold font-mono text-primary">—</p></div>
+        </div>
+        <div class="glass-panel rounded-xl p-4 flex items-center gap-3">
+            <span class="material-symbols-outlined text-error text-2xl">block</span>
+            <div><p class="text-[10px] uppercase text-secondary/60 font-bold tracking-widest">Blocked</p><p id="stat-block" class="text-2xl font-bold font-mono text-error">—</p></div>
+        </div>
+        <div class="glass-panel rounded-xl p-4 flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary text-2xl">monitor_heart</span>
+            <div><p class="text-[10px] uppercase text-secondary/60 font-bold tracking-widest">Monitored</p><p id="stat-monitor" class="text-2xl font-bold font-mono text-primary">—</p></div>
+        </div>
+        <div class="glass-panel rounded-xl p-4 flex items-center gap-3">
+            <span class="material-symbols-outlined text-tertiary text-2xl">check_circle</span>
+            <div><p class="text-[10px] uppercase text-secondary/60 font-bold tracking-widest">Allowed</p><p id="stat-allow" class="text-2xl font-bold font-mono text-tertiary">—</p></div>
+        </div>
+    </div>
+
+    <!-- ── FILTERS ────────────────────────────────────────────────── -->
+    <div class="px-6 pb-3 max-w-screen-2xl mx-auto flex flex-wrap gap-3 items-center">
+        <div class="flex-1 min-w-[200px] relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary/50 text-[16px]">search</span>
+            <input id="filter-search" type="text" placeholder="Search IP, category, decision…"
+                class="w-full bg-surface border border-outline-variant/30 rounded-lg pl-9 pr-4 py-2 text-sm text-secondary placeholder-secondary/30 focus:border-primary focus:outline-none transition-colors"
+                oninput="applyFilters()">
+        </div>
+        <select id="filter-decision" class="bg-surface border border-outline-variant/30 rounded-lg px-3 py-2 text-sm text-secondary focus:border-primary focus:outline-none transition-colors" onchange="applyFilters()">
+            <option value="">All Decisions</option>
+            <option value="BLOCK">BLOCK</option>
+            <option value="ALERT">ALERT</option>
+            <option value="MONITOR">MONITOR</option>
+            <option value="ALLOW">ALLOW</option>
+        </select>
+        <select id="filter-model" class="bg-surface border border-outline-variant/30 rounded-lg px-3 py-2 text-sm text-secondary focus:border-primary focus:outline-none transition-colors" onchange="applyFilters()">
+            <option value="">All Models</option>
+            <option value="random_forest">Random Forest</option>
+            <option value="xgboost">XGBoost</option>
+            <option value="logistic_regression">Logistic Regression</option>
+        </select>
+        <button onclick="clearFilters()" class="text-xs text-secondary/60 hover:text-primary transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">filter_alt_off</span>
+            Clear
+        </button>
+        <div class="h-8 w-px bg-outline-variant/20 mx-2 hidden md:block"></div>
+        <div class="flex items-center gap-2">
+            <select id="retention-hours" class="bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-xs text-secondary focus:border-primary focus:outline-none transition-colors">
+                <option value="3">Last 3 Hours</option>
+                <option value="8">Last 8 Hours</option>
+                <option value="24" selected>Last 24 Hours</option>
+                <option value="168">Last 7 Days</option>
+            </select>
+            <button onclick="applyRetention()" class="text-[10px] bg-error/10 text-error border border-error/30 px-3 py-2 rounded-lg hover:bg-error/20 transition-all font-bold uppercase tracking-wider">
+                Apply Retention
+            </button>
+        </div>
+        <div class="ml-auto text-[11px] text-secondary/40 font-mono" id="last-updated">—</div>
+    </div>
+
+    <!-- ── MAIN TABLE ─────────────────────────────────────────────── -->
+    <main class="px-6 pb-10 max-w-screen-2xl mx-auto">
+        <div class="glass-panel rounded-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="sticky top-0 z-10">
+                        <tr class="bg-[#060e20] text-secondary/70 text-[10px] uppercase tracking-wider font-bold">
+                            <th class="px-5 py-3">#</th>
+                            <th class="px-5 py-3 cursor-pointer hover:text-primary" onclick="sortTable('time')">Time ▕</th>
+                            <th class="px-5 py-3">Source IP</th>
+                            <th class="px-5 py-3">Attack Category</th>
+                            <th class="px-5 py-3">Decision</th>
+                            <th class="px-5 py-3">ML Confidence</th>
+                            <th class="px-5 py-3">Model Used</th>
+                            <th class="px-5 py-3">Requests</th>
+                            <th class="px-5 py-3">Attacks</th>
+                            <th class="px-5 py-3">Escalating</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-tbody" class="font-medium divide-y divide-outline-variant/10">
+                        <tr>
+                            <td colspan="10" class="px-6 py-12 text-center text-secondary/30 font-mono text-xs">
+                                <span class="material-symbols-outlined block text-4xl mb-2 opacity-20">hourglass_empty</span>
+                                Loading log archives from backend…
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="empty-state" class="hidden text-center py-16">
+            <span class="material-symbols-outlined text-5xl text-secondary/20 block mb-3">inbox</span>
+            <p class="text-secondary/40 font-mono text-sm">No records match your filters</p>
+        </div>
+    </main>
+
+    <!-- ── SCRIPT ─────────────────────────────────────────────────── -->
+    <script>
+        const API = 'http://127.0.0.1:8000';
+        let allRows = [];   // raw data from backend
+        let sortDir = -1;   // -1 = newest first
+
+        // ── Decision badge ──────────────────────────────────────────
+        function decisionBadge(d) {
+            const cls = `decision-${d}`;
+            return `<span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold border ${cls}">${d}</span>`;
+        }
+
+        // ── Model display name ──────────────────────────────────────
+        function modelLabel(m) {
+            const map = { random_forest: 'Random Forest', xgboost: 'XGBoost', logistic_regression: 'Logistic Reg' };
+            return map[m] || m || '—';
+        }
+
+        // ── Fetch + render ──────────────────────────────────────────
+        async function loadLogs() {
+            // Fetch from /evaluation/memory/active which has all IP summaries
+            try {
+                const r = await fetch(`${API}/evaluation/memory/active`);
+                if (!r.ok) throw new Error('Not OK');
+                const d = await r.json();
+                const summaries = d.ip_summaries || {};
+
+                // Flatten into rows — one row per IP
+                allRows = Object.entries(summaries).map(([ip, s], idx) => ({
+                    idx:       idx + 1,
+                    ip,
+                    category:  (s.attack_types && s.attack_types[0]) || (s.decisions && s.decisions[0] === 'ALLOW' ? 'Normal' : 'Unknown'),
+                    decision:  s.last_decision || guessDecision(s),
+                    confidence: s.avg_confidence || 0,
+                    model:     s.last_model || '—',
+                    requests:  s.requests || 0,
+                    attacks:   s.attacks || 0,
+                    escalating: s.is_escalating || false,
+                    last_seen:  s.last_seen ? new Date(s.last_seen) : new Date()
+                }));
+
+                // Sort newest first
+                allRows.sort((a, b) => b.last_seen - a.last_seen);
+                allRows.forEach((r, i) => r.idx = i + 1);
+
+                updateStats();
+                applyFilters();
+
+                document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+
+            } catch (e) {
+                document.getElementById('log-tbody').innerHTML = `
+                    <tr><td colspan="10" class="px-6 py-12 text-center text-error/60 font-mono text-xs">
+                        <span class="material-symbols-outlined block text-4xl mb-2">cloud_off</span>
+                        Backend unreachable — make sure uvicorn is running on port 8000
+                    </td></tr>`;
+            }
+        }
+
+        function guessDecision(s) {
+            if (s.blocks > 0) return 'BLOCK';
+            if (s.alerts > 0) return 'ALERT';
+            if (s.attacks > 0) return 'MONITOR';
+            return 'ALLOW';
+        }
+
+        // ── Stats bar ───────────────────────────────────────────────
+        function updateStats() {
+            document.getElementById('record-count').textContent = allRows.length;
+            document.getElementById('stat-total').textContent   = allRows.length;
+            document.getElementById('stat-block').textContent   = allRows.filter(r => r.decision === 'BLOCK').length;
+            document.getElementById('stat-monitor').textContent = allRows.filter(r => r.decision === 'MONITOR').length;
+            document.getElementById('stat-allow').textContent   = allRows.filter(r => r.decision === 'ALLOW').length;
+        }
+
+        // ── Filter + render ─────────────────────────────────────────
+        function applyFilters() {
+            const q  = document.getElementById('filter-search').value.toLowerCase();
+            const fd = document.getElementById('filter-decision').value;
+            const fm = document.getElementById('filter-model').value;
+
+            const filtered = allRows.filter(r => {
+                const matchQ  = !q || r.ip.toLowerCase().includes(q) || r.category.toLowerCase().includes(q) || r.decision.toLowerCase().includes(q);
+                const matchD  = !fd || r.decision === fd;
+                const matchM  = !fm || r.model === fm;
+                return matchQ && matchD && matchM;
+            });
+
+            const tbody = document.getElementById('log-tbody');
+            const empty = document.getElementById('empty-state');
+
+            if (!filtered.length) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            tbody.innerHTML = filtered.map((r, i) => {
+                const conf   = (r.confidence * 100).toFixed(1) + '%';
+                const time   = r.last_seen.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const escBadge = r.escalating
+                    ? `<span class="text-[9px] bg-error/20 text-error border border-error/40 px-1.5 py-0.5 rounded font-bold uppercase">Escalating</span>`
+                    : `<span class="text-[9px] text-secondary/30">—</span>`;
+                return `
+                <tr class="hover:bg-white/5 transition-colors ${i === 0 ? 'new-row' : ''}">
+                    <td class="px-5 py-3 text-secondary/30 font-mono text-xs">${i + 1}</td>
+                    <td class="px-5 py-3 font-mono text-secondary/60 text-xs whitespace-nowrap">${time}</td>
+                    <td class="px-5 py-3 font-bold font-mono text-xs ${r.decision === 'BLOCK' ? 'text-error' : r.decision === 'ALLOW' ? 'text-tertiary' : 'text-primary'}">${r.ip}</td>
+                    <td class="px-5 py-3 text-xs text-secondary/80">${r.category}</td>
+                    <td class="px-5 py-3">${decisionBadge(r.decision)}</td>
+                    <td class="px-5 py-3 font-mono text-xs">
+                        <div class="flex items-center gap-2">
+                            <div class="w-16 h-1 bg-surface rounded-full overflow-hidden">
+                                <div class="h-full rounded-full ${r.confidence > 0.85 ? 'bg-error' : r.confidence > 0.65 ? 'bg-yellow-400' : 'bg-tertiary'}" style="width:${Math.round(r.confidence*100)}%"></div>
+                            </div>
+                            <span>${conf}</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-3 text-xs text-secondary/70">${modelLabel(r.model)}</td>
+                    <td class="px-5 py-3 font-mono text-xs text-secondary">${r.requests}</td>
+                    <td class="px-5 py-3 font-mono text-xs ${r.attacks > 0 ? 'text-error' : 'text-secondary/40'}">${r.attacks}</td>
+                    <td class="px-5 py-3">${escBadge}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── Sort ────────────────────────────────────────────────────
+        function sortTable(field) {
+            sortDir *= -1;
+            if (field === 'time') allRows.sort((a, b) => sortDir * (b.last_seen - a.last_seen));
+            applyFilters();
+        }
+
+        // ── Retention Policy ─────────────────────────────────────────
+        async function applyRetention() {
+            const hours = document.getElementById('retention-hours').value;
+            if (!confirm(`Are you sure you want to delete all logs older than ${hours} hours? This will also remove them from the database.`)) return;
+
+            try {
+                const res = await fetch(`${API}/evaluation/decisions/purge-by-age?hours=${hours}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    alert(`Data retention policy applied: ${data.deleted_count} records purged.`);
+                    loadLogs(); // Reload table
+                } else {
+                    alert("Failed to apply retention: " + data.detail);
+                }
+            } catch (e) {
+                alert("Connection to backend failed.");
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('filter-search').value    = '';
+            document.getElementById('filter-decision').value = '';
+            document.getElementById('filter-model').value    = '';
+            applyFilters();
+        }
+
+        // ── Export CSV ───────────────────────────────────────────────
+        function exportCSV() {
+            const headers = ['#', 'Time', 'Source IP', 'Attack Category', 'Decision', 'ML Confidence', 'Model Used', 'Requests', 'Attacks', 'Escalating'];
+            const rows = [headers, ...allRows.map((r, i) => [
+                i + 1,
+                r.last_seen.toISOString(),
+                r.ip,
+                `"${r.category}"`,
+                r.decision,
+                (r.confidence * 100).toFixed(1) + '%',
+                modelLabel(r.model),
+                r.requests,
+                r.attacks,
+                r.escalating ? 'Yes' : 'No'
+            ])];
+            const csv  = rows.map(r => r.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const a    = Object.assign(document.createElement('a'), {
+                href:     URL.createObjectURL(blob),
+                download: `sentinel_full_log_${new Date().toISOString().slice(0,10)}.csv`
+            });
+            a.click();
+        }
+
+        // ── INIT ─────────────────────────────────────────────────────
+        loadLogs();
+        setInterval(loadLogs, 15000);
+    </script>
+
+    
+
+</body>
+</html>

@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>The Sentinel | Agentic AI Cybersecurity</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-container": "#002f35",
+                        "outline-variant": "#414754",
+                        "on-secondary": "#19324b",
+                        "secondary": "#b0c9e8",
+                        "on-secondary-fixed": "#011d35",
+                        "surface-container-high": "#222a3d",
+                        "secondary-fixed-dim": "#b0c9e8",
+                        "surface-dim": "#0b1326",
+                        "surface-container-highest": "#2d3449",
+                        "surface-container-lowest": "#060e20",
+                        "outline": "#8b90a0",
+                        "primary-fixed": "#9cf0ff",
+                        "on-tertiary-container": "#00311d",
+                        "surface-container": "#171f33",
+                        "primary-container": "#009fb2",
+                        "secondary-fixed": "#d1e4ff",
+                        "on-primary-fixed-variant": "#004f58",
+                        "surface-tint": "#00daf3",
+                        "tertiary-fixed": "#4dffb2",
+                        "background": "#0b1326",
+                        "secondary-container": "#314863",
+                        "inverse-primary": "#006875",
+                        "tertiary-container": "#00a56d",
+                        "tertiary": "#00e297",
+                        "primary-fixed-dim": "#00daf3",
+                        "on-primary": "#00363d",
+                        "inverse-on-surface": "#283044",
+                        "tertiary-fixed-dim": "#00e297",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface-container-low": "#131b2e",
+                        "on-secondary-container": "#9fb7d6",
+                        "surface-bright": "#31394d",
+                        "on-primary-fixed": "#001f24",
+                        "on-tertiary-fixed-variant": "#005234",
+                        "surface": "#0b1326",
+                        "on-surface": "#dae2fd",
+                        "on-tertiary-fixed": "#002112",
+                        "error": "#ffb4ab",
+                        "primary": "#00daf3",
+                        "error-container": "#93000a",
+                        "on-tertiary": "#003822",
+                        "surface-variant": "#2d3449",
+                        "on-surface-variant": "#c1c6d7",
+                        "on-secondary-fixed-variant": "#314863",
+                        "on-background": "#dae2fd",
+                        "inverse-surface": "#dae2fd"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .glass-panel {
+            background: rgba(45, 52, 73, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(65, 71, 84, 0.15);
+        }
+
+        .hero-glow {
+            background: radial-gradient(circle at 50% 50%, rgba(0, 218, 243, 0.08) 0%, transparent 70%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0b1326;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00daf3;
+            border-radius: 10px;
+        }
+    </style>
+
+
+
+</head>
+
+<body class="bg-background text-on-surface font-body selection:bg-primary/30 selection:text-primary">
+    <!-- Top Navigation Bar -->
+    <nav
+        class="fixed top-0 w-full flex justify-between items-center px-8 py-4 max-w-none bg-[#0b1326]/80 backdrop-blur-xl border-b border-[#00daf3]/10 shadow-2xl shadow-[#00daf3]/5 z-50">
+        <a href="screen.html"
+            class="text-2xl font-bold tracking-tighter text-[#00daf3] uppercase font-headline select-none cursor-pointer hover:text-white transition-colors">The
+            Sentinel</a>
+        <div class="hidden md:flex items-center gap-8 font-headline tracking-tight">
+            <a id="nav-overview" class="nav-segment text-primary border-b-2 border-primary pb-1 transition-colors"
+                href="#overview">Overview</a>
+            <a id="nav-detection"
+                class="nav-segment text-secondary hover:text-white transition-colors border-b-2 border-transparent pb-1"
+                href="#detection">Detection Engine</a>
+            <a id="nav-response"
+                class="nav-segment text-secondary hover:text-white transition-colors border-b-2 border-transparent pb-1"
+                href="#response">Response Pipeline</a>
+            <a id="nav-insights"
+                class="nav-segment text-secondary hover:text-white transition-colors border-b-2 border-transparent pb-1"
+                href="#insights">Project Insights</a>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="login.html"
+                class="px-5 py-2 text-[#b0c9e8] hover:text-white transition-all duration-300 font-medium">Login</a>
+            <a href="signup.html"
+                class="px-6 py-2 bg-[#00daf3] text-[#00363d] rounded-md font-bold hover:bg-[#00daf3]/90 active:scale-95 transition-all text-center">Signup</a>
+        </div>
+    </nav>
+    <main class="pt-24">
+        <!-- Hero Section: The Command Center -->
+        <section id="overview"
+            class="scroll-section scroll-m-24 relative min-h-[921px] flex flex-col items-center justify-center px-6 overflow-hidden hero-glow">
+            <div class="absolute inset-0 z-0 opacity-20 pointer-events-none">
+                <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+                </div>
+            </div>
+            <div
+                class="relative z-10 max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center mx-auto px-4 lg:px-8">
+                <div class="lg:col-span-6 flex flex-col justify-center text-left space-y-8 lg:pr-8 lg:translate-y-6">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase w-max">
+                        <span class="relative flex h-2 w-2">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                        </span>
+                        System Online — Agentic AI Active
+                    </div>
+                    <h1
+                        class="text-5xl lg:text-7xl font-headline font-bold text-white tracking-tighter leading-[0.9] text-left">
+                        Autonomous AI <br />
+                        <span class="text-primary">Defense</span> for Modern <br />
+                        Network Threats
+                    </h1>
+                    <p class="text-secondary/80 text-lg max-w-2xl text-left">
+                        Real-time intrusion detection and autonomous response powered by an agentic AI that analyzes
+                        threats and acts in milliseconds.
+                    </p>
+                    <div class="flex flex-wrap justify-start gap-4 pt-4 w-full">
+                        <button onclick="window.location.href='dashboard.html'"
+                            class="px-8 py-4 bg-primary text-on-primary font-bold rounded-md hover:shadow-[0_0_20px_rgba(0,218,243,0.4)] transition-all flex items-center gap-2">
+                            Open Dashboard
+                            <span class="material-symbols-outlined">security</span>
+                        </button>
+                        <button
+                            class="px-8 py-4 glass-panel text-white font-bold rounded-md hover:bg-white/10 transition-all">Learn
+                            More</button>
+                    </div>
+                </div>
+                <!-- Command Center Visual Component -->
+                <div class="lg:col-span-6 flex flex-col items-center justify-center relative">
+                    <div class="glass-panel rounded-xl p-1 shadow-2xl">
+                        <div
+                            class="bg-surface-container-lowest rounded-lg overflow-hidden border border-outline-variant/30">
+                            <!-- Header Info -->
+                            <div
+                                class="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-outline-variant/20">
+                                <div class="flex gap-1.5">
+                                    <div class="w-3 h-3 rounded-full bg-error/40"></div>
+                                    <div class="w-3 h-3 rounded-full bg-secondary/40"></div>
+                                    <div class="w-3 h-3 rounded-full bg-tertiary/40"></div>
+                                </div>
+                                <div class="text-[10px] font-mono text-outline uppercase tracking-widest">
+                                    Global_Nexus_Feed</div>
+                            </div>
+                            <!-- Live Terminal Area -->
+                            <div class="p-5 font-mono text-xs space-y-4 h-[400px] overflow-y-auto">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-tertiary">[SAFE]</span>
+                                    <span class="text-secondary/70">Incoming packet filtered: 192.168.1.104 -&gt;
+                                        TCP/443</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-tertiary">[SAFE]</span>
+                                    <span class="text-secondary/70">Handshake verified: Node Alpha-7</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-error">[WARN]</span>
+                                    <span class="text-error font-bold">Heuristic anomaly detected in
+                                        Service:AUTH_GW</span>
+                                </div>
+                                <div class="flex items-start gap-3 pl-8 border-l border-error/30 py-2">
+                                    <span class="text-primary">AGENTIC_RESPONSE:</span>
+                                    <span class="text-white">Isolating PID 4412... Analyzing behavior pattern...</span>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-tertiary">[HEAL]</span>
+                                    <span class="text-tertiary">Threat neutralized. Patching entry point at Layer
+                                        7.</span>
+                                </div>
+                                <div class="pt-4 grid grid-cols-2 gap-4">
+                                    <div class="bg-surface-container-low p-3 rounded border border-outline-variant/10">
+                                        <div class="text-outline text-[10px] uppercase">Threat Level</div>
+                                        <div class="text-xl font-headline font-bold text-tertiary">Low (2.4%)</div>
+                                    </div>
+                                    <div class="bg-surface-container-low p-3 rounded border border-outline-variant/10">
+                                        <div class="text-outline text-[10px] uppercase">Blocked Requests</div>
+                                        <div class="text-xl font-headline font-bold text-white">41,902</div>
+                                    </div>
+                                </div>
+                                <div class="opacity-50">
+                                    <div
+                                        class="h-1 w-full bg-surface-container-highest rounded-full overflow-hidden mt-2">
+                                        <div class="h-full bg-primary w-[75%]"></div>
+                                    </div>
+                                    <div class="flex justify-between mt-1 text-[8px] uppercase">
+                                        <span>CPU: 42%</span>
+                                        <span>MEM: 12GB/32GB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+            <!-- Stats Banner -->
+            <div class="bg-surface-container-low py-12 border-y border-outline-variant/10 w-full relative z-10 mt-auto">
+                <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-headline font-bold text-white">99.9%</div>
+                        <div class="text-xs text-outline uppercase tracking-widest mt-1">Uptime SLA</div>
+                    </div>
+                    <div class="text-center border-l border-outline-variant/10">
+                        <div class="text-3xl font-headline font-bold text-primary">12ms</div>
+                        <div class="text-xs text-outline uppercase tracking-widest mt-1">Response Time</div>
+                    </div>
+                    <div class="text-center border-l border-outline-variant/10">
+                        <div class="text-3xl font-headline font-bold text-tertiary" id="hero-metric-latency">93ms</div>
+                        <div class="text-xs text-outline uppercase tracking-widest mt-1">Avg Inference Latency</div>
+                    </div>
+                    <div class="text-center border-l border-outline-variant/10">
+                        <div class="text-3xl font-headline font-bold text-white" id="hero-metric-packets">Live</div>
+                        <div class="text-xs text-outline uppercase tracking-widest mt-1">Threat Feed Status</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Detection Engine Mechanics -->
+        <section id="detection" class="scroll-section scroll-m-24 py-24 px-6 bg-surface">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col lg:flex-row justify-between items-end gap-6 mb-16">
+                    <div class="max-w-2xl">
+                        <h2 class="text-4xl font-headline font-bold text-white mb-4">Detection Engine Mechanics</h2>
+                        <p class="text-secondary text-lg">The Agentic AI Cyber System's defense pipeline continuously
+                            captures live network traffic, applies machine learning–based intrusion analysis, and
+                            activates autonomous response agents to contain malicious activity before it impacts
+                            critical infrastructure.</p>
+                    </div>
+                    <div class="hidden lg:block">
+                        <span class="material-symbols-outlined text-primary/20 text-8xl">hub</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Step 1 -->
+                    <div class="bg-surface-container-low p-8 rounded-lg relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <span class="material-symbols-outlined text-7xl">sensors</span>
+                        </div>
+                        <div class="text-primary font-headline font-bold text-4xl mb-6">01</div>
+                        <h3 class="text-xl font-bold text-white mb-3">Live Traffic Intelligence</h3>
+                        <p class="text-secondary/70 leading-relaxed">The system continuously captures and analyzes
+                            incoming network traffic streams from connected nodes. Using protocol-aware inspection and
+                            flow-level metadata extraction, it identifies suspicious communication patterns before they
+                            escalate into active threats.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="bg-surface-container-low p-8 rounded-lg relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <span class="material-symbols-outlined text-7xl">psychology</span>
+                        </div>
+                        <div class="text-primary font-headline font-bold text-4xl mb-6">02</div>
+                        <h3 class="text-xl font-bold text-white mb-3">ML-Driven Threat Classification</h3>
+                        <p class="text-secondary/70 leading-relaxed">Captured traffic flows through proprietary
+                            deep-learning models, classifying anomalies across multiple intrusion categories in
+                            milliseconds. This ensures high-confidence detection of Zero-Day exploits, DDoS, botnet
+                            behaviors, and lateral movement attempts.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="bg-surface-container-low p-8 rounded-lg relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <span class="material-symbols-outlined text-7xl">shield</span>
+                        </div>
+                        <div class="text-primary font-headline font-bold text-4xl mb-6">03</div>
+                        <h3 class="text-xl font-bold text-white mb-3">Autonomous Agent Response</h3>
+                        <p class="text-secondary/70 leading-relaxed">Upon threat verification, the agentic engine
+                            executes targeted mitigation sequences automatically. Actions include dynamic IP isolation,
+                            session termination, deep forensic logging, and self-healing recovery workflows to ensure
+                            zero operational downtime.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Autonomous Response Pipeline -->
+        <section id="response"
+            class="scroll-section scroll-m-24 py-24 px-6 lg:px-12 bg-surface-container-lowest relative overflow-hidden border-t border-outline-variant/10">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-4xl font-headline font-bold text-white mb-4">Autonomous Response Pipeline</h2>
+                <p class="text-secondary text-lg mb-16 max-w-3xl">The system output maps direct mitigation workflows.
+                    Once a threat surpasses the confidence threshold, the agent executes targeted actions instantly.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-4xl text-error mb-4 group-hover:scale-110 transition-transform">block</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Malicious IP Isolation</h3>
+                        <p class="text-secondary/70 text-sm leading-relaxed">Instantly drops packets and modifies
+                            routing tables at the edge firewall to sever communication with blacklisted nodes.</p>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-4xl text-primary mb-4 group-hover:scale-110 transition-transform">model_training</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Model-Triggered Response</h3>
+                        <p class="text-secondary/70 text-sm leading-relaxed">Neural network confidence scores dictate
+                            the severity and speed of the mitigation, avoiding false-positive lockouts.</p>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-4xl text-[#b0c9e8] mb-4 group-hover:scale-110 transition-transform">notifications_active</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Alert Escalation</h3>
+                        <p class="text-secondary/70 text-sm leading-relaxed">Critical zero-day behaviors bypass standard
+                            logging to immediately ping the incident response team via secure channels.</p>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-4xl text-tertiary mb-4 group-hover:scale-110 transition-transform">receipt_long</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Forensic Log Creation</h3>
+                        <p class="text-secondary/70 text-sm leading-relaxed">Generates immutable, cryptographically
+                            signed audit trails of the entire attack sequence for post-breach analysis.</p>
+                    </div>
+                    <!-- Card 5 -->
+                    <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-4xl text-secondary mb-4 group-hover:scale-110 transition-transform">health_and_safety</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Auto Recovery</h3>
+                        <p class="text-secondary/70 text-sm leading-relaxed">Self-healing mechanisms automatically
+                            restart compromised services from secure snapshots, ensuring zero downtime.</p>
+                    </div>
+                    <!-- Card 6 -->
+                    <div class="glass-panel p-6 rounded-xl hover:border-primary/50 transition-colors group">
+                        <span
+                            class="material-symbols-outlined text-4xl text-primary mb-4 group-hover:scale-110 transition-transform">timer</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Response Latency</h3>
+                        <p class="text-secondary/70 text-sm leading-relaxed">Complete identification-to-isolation loop
+                            executed in sub-10ms, drastically outpacing human operator capabilities.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Insights Summary -->
+        <section id="insights"
+            class="scroll-section scroll-m-24 py-24 px-6 lg:px-12 bg-surface relative overflow-hidden">
+            <div class="absolute inset-0 z-0 opacity-[0.03]">
+                <img class="w-full h-full object-cover mix-blend-overlay grayscale"
+                    data-alt="abstract tech visualization"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGiFJaRqA-KqEbWlL3GIZrtpeCCwT4GvSWuL2DOjc0RqT43tRjsvBinuEsMIzAZbPIqXgx8HUd6L8CaGPVloLa_pIShkGlQg1i87qOS_hG5kI7PktU89aDS2CwgppYC6Qla_Ruzq8KK8xLb-kOM-vhae_AaJa-DIcJ8IlEjwxWfNRZ9XXfym6lzLpvPSTLcu_fRbFt9JIodPUavS8vz6TYSjFALxlEr18v-RWoqc_m_t_2Jhhp5z72fu_iryhi5uaKJYzm-ZAKynoP" />
+            </div>
+
+            <div class="max-w-7xl mx-auto relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-headline font-bold text-primary mb-4">Project Insights</h2>
+                    <p class="text-xl text-secondary max-w-3xl mx-auto">An autonomous cybersecurity system that detects,
+                        reasons, and responds to network threats in real time without human intervention.</p>
+                </div>
+
+                <!-- Mission & Novelty -->
+                <div class="glass-panel p-8 rounded-2xl mb-8 border-l-4 border-l-primary shadow-2xl shadow-primary/5">
+                    <h3 class="text-2xl font-bold text-white mb-3">Autonomous Architecture</h3>
+                    <p class="text-on-surface leading-loose font-light">
+                        The Sentinel transitions cyber defense from passive alerting to autonomous action. By
+                        integrating a multi-model ML ensemble with a LangChain-powered reasoning agent, the system
+                        evaluates threat context in real-time and executes proportionate responsess lashing reaction
+                        times from hours to milliseconds.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Datasets -->
+                    <div
+                        class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/20 hover:border-primary/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-symbols-outlined text-3xl text-tertiary">dataset</span>
+                            <h3 class="text-xl font-bold text-white">Intelligence Datasets</h3>
+                        </div>
+                        <ul class="space-y-4 text-secondary/90 text-sm">
+                            <li class="flex items-start gap-3"><span
+                                    class="text-tertiary material-symbols-outlined text-lg">check_circle</span>
+                                <div><strong class="text-white">CIC-IDS-2017:</strong> Modern attack traffic dataset
+                                    DDoS, PortScan, Brute Force, Web Attacks, Botnet (~3M rows, 78 features)</div>
+                            </li>
+                            <li class="flex items-start gap-3"><span
+                                    class="text-tertiary material-symbols-outlined text-lg">check_circle</span>
+                                <div><strong class="text-white">UNSW-NB15:</strong> Comprehensive intrusion dataset
+                                    DoS, Backdoor, Exploits, Fuzzers, Reconnaissance (~2M rows, 47 features)</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- ML Models -->
+                    <div
+                        class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/20 hover:border-primary/30 transition-colors">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="material-symbols-outlined text-3xl text-[#b0c9e8]">network_node</span>
+                            <h3 class="text-xl font-bold text-white">Detection Ensemble</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span
+                                class="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-xs font-bold uppercase tracking-widest">Random
+                                Forest</span>
+                            <span
+                                class="px-3 py-1 bg-tertiary/10 text-tertiary border border-tertiary/20 rounded-full text-xs font-bold uppercase tracking-widest">XGBoost</span>
+                            <span
+                                class="px-3 py-1 bg-surface-variant text-secondary border border-outline-variant/30 rounded-full text-xs font-bold uppercase tracking-widest">Logistic
+                                Regression</span>
+                        </div>
+                        <ul class="space-y-4 text-secondary/90 text-sm">
+                            <li class="flex items-start gap-3"><span
+                                    class="text-primary material-symbols-outlined text-lg">forest</span>
+                                <div><strong class="text-white">Random Forest:</strong> 99.58% accuracy high-speed
+                                    signature classification across UNSW-NB15 and CIC-IDS-2017</div>
+                            </li>
+                            <li class="flex items-start gap-3"><span
+                                    class="text-tertiary material-symbols-outlined text-lg">bolt</span>
+                                <div><strong class="text-white">XGBoost:</strong> 99.47% accuracy gradient boosted
+                                    ensemble for attack pattern detection</div>
+                            </li>
+                            <li class="flex items-start gap-3"><span
+                                    class="text-secondary material-symbols-outlined text-lg">functions</span>
+                                <div><strong class="text-white">Logistic Regression:</strong> 99.11% accuracy
+                                    lightweight baseline classifier for rapid triage</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Results -->
+                    <div class="md:col-span-2 glass-panel p-8 rounded-xl flex flex-col justify-center">
+                        <h3 class="text-xl font-bold text-white mb-8 border-b border-outline-variant/20 pb-4">System
+                            Performance</h3>
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div>
+                                <div
+                                    class="text-3xl md:text-5xl font-headline font-bold text-tertiary drop-shadow-[0_0_15px_rgba(0,226,151,0.3)]">
+                                    99.58%</div>
+                                <div class="text-[9px] md:text-[10px] uppercase text-outline tracking-widest mt-2">
+                                    Detection Accuracy</div>
+                            </div>
+                            <div class="border-l border-outline-variant/20">
+                                <div
+                                    class="text-3xl md:text-5xl font-headline font-bold text-primary drop-shadow-[0_0_15px_rgba(0,218,243,0.3)]">
+                                    &lt; 5%</div>
+                                <div class="text-[9px] md:text-[10px] uppercase text-outline tracking-widest mt-2">False
+                                    Positive Rate</div>
+                            </div>
+                            <div class="border-l border-outline-variant/20">
+                                <div
+                                    class="text-3xl md:text-5xl font-headline font-bold text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                                    &lt; 12ms</div>
+                                <div class="text-[9px] md:text-[10px] uppercase text-outline tracking-widest mt-2">
+                                    Response Latency</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Team Info -->
+                    <div
+                        class="bg-surface-container-lowest p-6 rounded-xl border border-primary/20 flex flex-col justify-center relative overflow-hidden group hover:border-primary/50 transition-colors">
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all">
+                        </div>
+                        <p
+                            style="text-align:center;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:#7a8ba8;margin-bottom:1rem;">
+                            Project Team</p>
+                        <!-- Leader -->
+                        <div
+                            style="text-align:center;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(65,71,84,0.3);">
+                            <div
+                                style="font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;color:#00daf3;margin-bottom:0.25rem;">
+                                Lead AI Engineer</div>
+                            <div style="font-weight:700;font-size:1rem;">Muhammad Ameen</div>
+                            <div style="font-size:0.72rem;color:#7a8ba8;margin-top:0.2rem;">AI/ML Pipeline · Backend ·
+                                Frontend · LangChain Agent</div>
+                        </div>
+                        <!-- Team Members -->
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+                            <div style="text-align:center;">
+                                <div
+                                    style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7a8ba8;margin-bottom:0.15rem;">
+                                    Team Member</div>
+                                <div style="font-weight:600;font-size:0.85rem;">[Name]</div>
+                                <div style="font-size:0.68rem;color:#7a8ba8;">[Role]</div>
+                            </div>
+                            <div style="text-align:center;">
+                                <div
+                                    style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7a8ba8;margin-bottom:0.15rem;">
+                                    Team Member</div>
+                                <div style="font-weight:600;font-size:0.85rem;">[Name]</div>
+                                <div style="font-size:0.68rem;color:#7a8ba8;">[Role]</div>
+                            </div>
+                            <div style="text-align:center;">
+                                <div
+                                    style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7a8ba8;margin-bottom:0.15rem;">
+                                    Team Member</div>
+                                <div style="font-weight:600;font-size:0.85rem;">[Name]</div>
+                                <div style="font-size:0.68rem;color:#7a8ba8;">[Role]</div>
+                            </div>
+                            <div style="text-align:center;">
+                                <div
+                                    style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7a8ba8;margin-bottom:0.15rem;">
+                                    Team Member</div>
+                                <div style="font-weight:600;font-size:0.85rem;">[Name]</div>
+                                <div style="font-size:0.68rem;color:#7a8ba8;">[Role]</div>
+                            </div>
+                            <div style="text-align:center;grid-column:1/-1;">
+                                <div
+                                    style="font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:#7a8ba8;margin-bottom:0.15rem;">
+                                    Team Member</div>
+                                <div style="font-weight:600;font-size:0.85rem;">[Name]</div>
+                                <div style="font-size:0.68rem;color:#7a8ba8;">[Role]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Action Section: Forms -->
+        <section class="py-24 px-6 bg-surface">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <!-- Registration Form -->
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="text-3xl font-headline font-bold text-white">Deploy Your Defense Grid</h2>
+                        <p class="text-secondary mt-2">Integrate your first Sentinel Agent in under 5 minutes and secure
+                            your infrastructure instantly.</p>
+                    </div>
+                    <form class="space-y-4" action="signup.html">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1">
+                                <label class="text-[10px] uppercase tracking-widest text-outline font-bold">First
+                                    Name</label>
+                                <input
+                                    class="w-full bg-surface-container-high border-none rounded p-3 text-white focus:ring-1 focus:ring-primary placeholder-outline/30"
+                                    placeholder="Muhammad" type="text" />
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] uppercase tracking-widest text-outline font-bold">Last
+                                    Name</label>
+                                <input
+                                    class="w-full bg-surface-container-high border-none rounded p-3 text-white focus:ring-1 focus:ring-primary placeholder-outline/30"
+                                    placeholder="Ameen" type="text" />
+                            </div>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase tracking-widest text-outline font-bold">Email
+                                Address</label>
+                            <input
+                                class="w-full bg-surface-container-high border-none rounded p-3 text-white focus:ring-1 focus:ring-primary placeholder-outline/30"
+                                placeholder="rajper@company.xyz" type="email" />
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] uppercase tracking-widest text-outline font-bold">Access
+                                Level</label>
+                            <select
+                                class="w-full bg-surface-container-high border-none rounded p-3 text-white focus:ring-1 focus:ring-primary">
+                                <option>Sentinel Tier 1 (Free)</option>
+                                <option>Sentinel Tier 2 (Pro)</option>
+                                <option>Enterprise Command (Custom)</option>
+                            </select>
+                        </div>
+                        <button
+                            class="w-full py-4 bg-primary text-on-primary font-bold rounded hover:bg-primary-container transition-colors uppercase tracking-widest text-sm"
+                            type="submit">Join the Defense Network</button>
+                    </form>
+                </div>
+                <!-- Visual Accent / Social Proof -->
+                <div class="flex items-center justify-center">
+                    <div class="relative w-full aspect-square max-w-md">
+                        <div
+                            class="absolute inset-0 border-2 border-dashed border-primary/20 rounded-full animate-[spin_20s_linear_infinite]">
+                        </div>
+                        <div class="absolute inset-8 border border-secondary/10 rounded-full"></div>
+                        <div
+                            class="absolute inset-16 glass-panel rounded-full flex items-center justify-center flex-col text-center p-8">
+                            <span class="material-symbols-outlined text-primary text-6xl mb-4"
+                                data-weight="fill">verified_user</span>
+                            <div class="text-white font-headline font-bold text-2xl">Real-Time Threat Assurance</div>
+                            <p class="text-secondary/60 text-sm mt-2">Suspicious packets, sessions, and behavioral
+                                anomalies are instantly verified through AI-driven analytics to ensure rapid and
+                                accurate defensive actions.</p>
+                        </div>
+                        <!-- Floating Nodes -->
+                        <div
+                            class="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-12 bg-tertiary-container rounded-full border-2 border-surface flex items-center justify-center text-on-tertiary-container shadow-lg shadow-tertiary/20">
+                            <span class="material-symbols-outlined text-sm">lock</span>
+                        </div>
+                        <div
+                            class="absolute bottom-12 right-0 w-12 h-12 bg-primary-container rounded-full border-2 border-surface flex items-center justify-center text-on-primary-container shadow-lg shadow-primary/20">
+                            <span class="material-symbols-outlined text-sm">bolt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Footer -->
+    <footer class="w-full border-t border-[#131b2e] bg-[#0b1326] px-8 py-12 flex flex-col gap-4">
+        <div class="text-lg font-bold text-[#00daf3] font-headline uppercase">The Sentinel</div>
+        <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <p class="font-['Inter'] text-sm tracking-wide text-[#b0c9e8]/60">© 2026 The Sentinel. Built by Muhammad
+                Ameen Rajper.</p>
+            <div class="flex flex-wrap gap-6 font-['Inter'] text-sm tracking-wide">
+                <a class="text-[#b0c9e8]/60 hover:text-[#00daf3] transition-colors" href="#">Privacy Protocol</a>
+                <a class="text-[#b0c9e8]/60 hover:text-[#00daf3] transition-colors" href="#">Service Terms</a>
+                <a class="text-[#b0c9e8]/60 hover:text-[#00daf3] transition-colors" href="#">API Docs</a>
+                <a class="text-[#b0c9e8]/60 hover:text-[#00daf3] transition-colors" href="#">Status</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const sections = document.querySelectorAll(".scroll-section");
+            const navLinks = document.querySelectorAll(".nav-segment");
+
+            navLinks.forEach(link => {
+                link.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute("href").substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        window.scrollTo({
+                            top: targetSection.offsetTop - 80,
+                            behavior: "smooth"
+                        });
+                    }
+                });
+            });
+
+            const observerOptions = {
+                root: null,
+                rootMargin: "-40% 0px -60% 0px",
+                threshold: 0
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute("id");
+
+                        navLinks.forEach(link => {
+                            link.classList.remove("text-primary", "border-primary");
+                            link.classList.add("text-secondary", "border-transparent");
+                        });
+
+                        const activeLink = document.getElementById("nav-" + id);
+                        if (activeLink) {
+                            activeLink.classList.remove("text-secondary", "border-transparent");
+                            activeLink.classList.add("text-primary", "border-primary");
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(sec => {
+                observer.observe(sec);
+            });
+
+            // Dynamic data hookup for hero metrics
+            async function fetchSystemStats() {
+                try {
+                    const res = await fetch('http://127.0.0.1:8000/agent/info');
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.total_decisions) {
+                            document.getElementById('hero-metric-packets').textContent = data.total_decisions.toLocaleString();
+                        }
+                        if (data.active_model && data.active_model.includes('xgboost')) {
+                            document.getElementById('hero-metric-latency').textContent = '2ms';
+                        } else if (data.active_model && data.active_model.includes('logistic')) {
+                            document.getElementById('hero-metric-latency').textContent = '1ms';
+                        } else {
+                            document.getElementById('hero-metric-latency').textContent = '93ms';
+                        }
+                    }
+                } catch (err) {
+                    console.error("Failed to load stats:", err);
+                }
+            }
+
+            fetchSystemStats();
+            setInterval(fetchSystemStats, 30000); // refresh every 30s
+        });
+    </script>
+
+
+
+</body>
+
+</html>

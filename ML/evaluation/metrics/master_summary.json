@@ -1,0 +1,170 @@
+{
+    "UNSW-NB15": {
+        "random_forest": {
+            "display_name": "Random Forest",
+            "dataset": "UNSW-NB15",
+            "metrics": {
+                "accuracy": 0.9949,
+                "precision": 0.9476,
+                "recall": 0.9473,
+                "f1": 0.9474
+            },
+            "confusion_matrix": {
+                "tn": 390910,
+                "fp": 1044,
+                "fn": 1051,
+                "tp": 18878
+            }
+        },
+        "xgboost": {
+            "display_name": "XGBoost",
+            "dataset": "UNSW-NB15",
+            "metrics": {
+                "accuracy": 0.9942,
+                "precision": 0.9457,
+                "recall": 0.9329,
+                "f1": 0.9393
+            },
+            "confusion_matrix": {
+                "tn": 390887,
+                "fp": 1067,
+                "fn": 1337,
+                "tp": 18592
+            }
+        },
+        "logistic_regression": {
+            "display_name": "Logistic Regression",
+            "dataset": "UNSW-NB15",
+            "metrics": {
+                "accuracy": 0.9881,
+                "precision": 0.8436,
+                "recall": 0.9263,
+                "f1": 0.883
+            },
+            "confusion_matrix": {
+                "tn": 388531,
+                "fp": 3423,
+                "fn": 1468,
+                "tp": 18461
+            }
+        }
+    },
+    "CIC-IDS-2017": {
+        "random_forest": {
+            "display_name": "Random Forest",
+            "dataset": "CIC-IDS-2017",
+            "metrics": {
+                "accuracy": 0.9988,
+                "precision": 0.9971,
+                "recall": 0.9953,
+                "f1": 0.9962
+            },
+            "confusion_matrix": {
+                "tn": 364732,
+                "fp": 196,
+                "fn": 317,
+                "tp": 66555
+            }
+        },
+        "xgboost": {
+            "display_name": "XGBoost",
+            "dataset": "CIC-IDS-2017",
+            "metrics": {
+                "accuracy": 0.9992,
+                "precision": 0.9976,
+                "recall": 0.9974,
+                "f1": 0.9975
+            },
+            "confusion_matrix": {
+                "tn": 364765,
+                "fp": 163,
+                "fn": 176,
+                "tp": 66696
+            }
+        },
+        "logistic_regression": {
+            "display_name": "Logistic Regression",
+            "dataset": "CIC-IDS-2017",
+            "metrics": {
+                "accuracy": 0.9721,
+                "precision": 0.9653,
+                "recall": 0.8506,
+                "f1": 0.9043
+            },
+            "confusion_matrix": {
+                "tn": 362881,
+                "fp": 2047,
+                "fn": 9993,
+                "tp": 56879
+            }
+        }
+    },
+    "latency": {
+        "random_forest": {
+            "mean_ms": 93.6002,
+            "median_ms": 100.9101,
+            "p95_ms": 117.4918,
+            "p99_ms": 134.758,
+            "min_ms": 37.8788,
+            "max_ms": 269.1898
+        },
+        "xgboost": {
+            "mean_ms": 1.4115,
+            "median_ms": 1.1412,
+            "p95_ms": 2.4946,
+            "p99_ms": 3.0056,
+            "min_ms": 0.0,
+            "max_ms": 3.6922
+        },
+        "logistic_regression": {
+            "mean_ms": 0.1131,
+            "median_ms": 0.0,
+            "p95_ms": 1.0026,
+            "p99_ms": 1.1622,
+            "min_ms": 0.0,
+            "max_ms": 1.581
+        }
+    },
+    "cross_dataset": {
+        "UNSW-NB15": {
+            "random_forest": {
+                "accuracy": 0.9949,
+                "precision": 0.9476,
+                "recall": 0.9473,
+                "f1": 0.9474
+            },
+            "xgboost": {
+                "accuracy": 0.9942,
+                "precision": 0.9457,
+                "recall": 0.9329,
+                "f1": 0.9393
+            },
+            "logistic_regression": {
+                "accuracy": 0.9881,
+                "precision": 0.8436,
+                "recall": 0.9263,
+                "f1": 0.883
+            }
+        },
+        "CIC-IDS-2017": {
+            "random_forest": {
+                "accuracy": 0.9988,
+                "precision": 0.9971,
+                "recall": 0.9953,
+                "f1": 0.9962
+            },
+            "xgboost": {
+                "accuracy": 0.9992,
+                "precision": 0.9976,
+                "recall": 0.9974,
+                "f1": 0.9975
+            },
+            "logistic_regression": {
+                "accuracy": 0.9721,
+                "precision": 0.9653,
+                "recall": 0.8506,
+                "f1": 0.9043
+            }
+        }
+    }
+}

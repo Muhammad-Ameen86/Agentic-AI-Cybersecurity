@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>The Sentinel | SOC Command Center</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Fonts / Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+              "on-primary-container": "#002f35",
+              "outline-variant": "#414754",
+              "on-secondary": "#19324b",
+              "secondary": "#b0c9e8",
+              "on-secondary-fixed": "#011d35",
+              "surface-container-high": "#222a3d",
+              "secondary-fixed-dim": "#b0c9e8",
+              "surface-dim": "#0b1326",
+              "surface-container-highest": "#2d3449",
+              "surface-container-lowest": "#060e20",
+              "outline": "#8b90a0",
+              "primary-fixed": "#9cf0ff",
+              "on-tertiary-container": "#00311d",
+              "surface-container": "#171f33",
+              "primary-container": "#009fb2",
+              "secondary-fixed": "#d1e4ff",
+              "on-primary-fixed-variant": "#004f58",
+              "surface-tint": "#00daf3",
+              "tertiary-fixed": "#4dffb2",
+              "background": "#0b1326",
+              "secondary-container": "#314863",
+              "inverse-primary": "#006875",
+              "tertiary-container": "#00a56d",
+              "tertiary": "#00e297",
+              "primary-fixed-dim": "#00daf3",
+              "on-primary": "#00363d",
+              "inverse-on-surface": "#283044",
+              "tertiary-fixed-dim": "#00e297",
+              "on-error-container": "#ffdad6",
+              "on-error": "#690005",
+              "surface-container-low": "#131b2e",
+              "on-secondary-container": "#9fb7d6",
+              "surface-bright": "#31394d",
+              "on-primary-fixed": "#001f24",
+              "on-tertiary-fixed-variant": "#005234",
+              "surface": "#0b1326",
+              "on-surface": "#dae2fd",
+              "on-tertiary-fixed": "#002112",
+              "error": "#ffb4ab",
+              "primary": "#00daf3",
+              "error-container": "#93000a",
+              "on-tertiary": "#003822",
+              "surface-variant": "#2d3449",
+              "on-surface-variant": "#c1c6d7",
+              "on-secondary-fixed-variant": "#314863",
+              "on-background": "#dae2fd",
+              "inverse-surface": "#dae2fd"
+            },
+                    fontFamily: {
+                        headline: ["Space Grotesk"],
+                        body: ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(19, 27, 46, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(65, 71, 84, 0.4);
+        }
+
+        .cyber-glow {
+            box-shadow: 0 0 20px rgba(0, 218, 243, 0.15);
+        }
+
+        .cyber-glow-error {
+            box-shadow: 0 0 20px rgba(255, 180, 171, 0.15);
+        }
+
+        /* Auto Scroll Hide */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #060e20;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-button {
+            display: none;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(65, 71, 84, 0.6);
+        }
+
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #060e20 transparent;
+        }
+
+        /* Animations */
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        .animate-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgba(0, 218, 243, 0.5), transparent);
+            opacity: 0.3;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        .fade-in-down {
+            animation: fadeInDown 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .msf {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Profile Dropdown */
+        #profile-dropdown {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            width: 290px;
+            z-index: 200;
+            animation: fadeInDown 0.2s ease;
+        }
+    </style>
+
+    
+
+</head>
+
+<body class="bg-background text-white font-body overflow-x-hidden selection:bg-primary selection:text-[#00363d]">
+    <div class="animate-scanline"></div>
+
+    <!-- SideNavBar -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 z-[60] bg-[#02050b] border-r border-outline-variant/30 flex flex-col py-6">
+        <div class="px-6 mb-10">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/40 shadow-[0_0_15px_rgba(0,218,243,0.3)]">
+                    <span class="material-symbols-outlined text-primary"
+                        style="font-variation-settings: 'FILL' 1;">security</span>
+                </div>
+                <div>
+                    <h1 class="text-primary font-headline font-bold tracking-tight">The Sentinel</h1>
+                    <p class="text-[10px] text-secondary tracking-[0.2em] uppercase opacity-70"></p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary bg-primary/10 border-l-4 border-primary font-medium transition-all"
+                href="dashboard.html">
+                <span class="material-symbols-outlined">space_dashboard</span><span>Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all"
+                href="network_nodes.html">
+                <span class="material-symbols-outlined">lan</span><span>Network Nodes</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all"
+                href="ml_models.html">
+                <span class="material-symbols-outlined">psychology</span><span>ML Models</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all"
+                href="policies.html">
+                <span class="material-symbols-outlined">gavel</span><span>Policies</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all" href="settings.html">
+                <span class="material-symbols-outlined">settings</span><span>Settings</span>
+            </a>
+        </nav>
+        <div class="px-4 mt-auto space-y-2">
+            <button id="btn-deploy-agent" onclick="toggleModal('deploy-modal')"
+                class="w-full py-3 bg-primary text-[#00363d] rounded-md font-bold flex items-center justify-center gap-2 hover:bg-[#9cf0ff] hover:shadow-[0_0_20px_rgba(0,218,243,0.5)] transition-all">
+                <span class="material-symbols-outlined">rocket_launch</span> Deploy Agent
+            </button>
+            <button id="btn-stop-agent" onclick="stopAgent()"
+                class="hidden w-full py-3 bg-error/20 text-error border border-error/40 rounded-md font-bold flex items-center justify-center gap-2 hover:bg-error/30 hover:shadow-[0_0_15px_rgba(255,180,171,0.3)] transition-all text-sm">
+                <span class="material-symbols-outlined" style="font-size:18px">stop_circle</span> Stop Agent
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="ml-64 min-h-screen relative">
+        <!-- TopNavBar (Glassmorphic) -->
+        <header
+            class="sticky top-0 z-50 flex justify-between items-center w-full px-8 py-4 backdrop-blur-md bg-background/80 border-b border-outline-variant/30">
+            <div class="flex items-center gap-6">
+                <div class="relative group">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <span class="material-symbols-outlined text-outline-variant">search</span>
+                    </span>
+                    <input
+                        class="bg-surface border border-outline-variant/30 focus:border-primary text-sm rounded-lg focus:ring-1 focus:ring-primary w-64 pl-10 py-2"
+                        placeholder="Scan network assets..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <!-- WebSocket Status Indicator -->
+                <div class="flex items-center gap-2 px-3 py-1 bg-surface rounded-full border border-outline-variant/30">
+                    <span class="relative flex h-2 w-2">
+                        <span id="ws-status-ping"
+                            class="hidden absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                        <span id="ws-status-dot"
+                            class="relative inline-flex rounded-full h-2 w-2 bg-outline-variant"></span>
+                    </span>
+                    <span id="ws-status-text"
+                        class="text-[10px] uppercase tracking-wider text-outline-variant font-bold">Offline</span>
+                </div>
+
+                <div class="relative" id="user-menu-wrap">
+                    <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer select-none"
+                        onclick="toggleUserMenu()">
+                        <span class="text-right">
+                            <p class="text-xs font-bold leading-tight" id="nav-username">Muhammad Ameen</p>
+                            <p class="text-[10px] text-primary leading-tight">SOC Analyst</p>
+                        </span>
+                        <div class="w-9 h-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-sm"
+                            id="nav-avatar">MA</div>
+                    </div>
+
+                    <!-- Profile Dropdown Panel -->
+                    <div class="hidden absolute right-0 top-[calc(100%+8px)] w-[290px] z-[200] bg-[#02050b] rounded-xl shadow-2xl border border-outline-variant/40 overflow-hidden"
+                        id="profile-dropdown">
+                        <!-- User Info Header -->
+                        <div class="px-4 py-4 border-b border-outline-variant/30 bg-surface-container-lowest">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-base"
+                                    id="dd-avatar">MA</div>
+                                <div>
+                                    <p class="text-sm font-bold" id="dd-name">Muhammad Ameen</p>
+                                    <p class="text-[11px] text-primary font-mono" id="dd-email">analyst@sentinel.io</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse inline-block"></span>
+                                    <span class="text-[10px] font-mono text-tertiary uppercase tracking-widest">Session
+                                        Active</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-secondary/40" id="dd-login-time">—</span>
+                            </div>
+                        </div>
+                        <!-- Menu Items -->
+                        <div class="py-2">
+                            <button onclick="window.location.href=\'settings.html\'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">manage_accounts</span>
+                                Account Settings
+                            </button>
+                            <button
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">notifications</span>
+                                Alerts &amp; Notifications
+                            </button>
+                            
+                            <div class="border-t border-outline-variant/20 my-1 mx-4"></div>
+                            <button onclick="window.location.href='network_nodes.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">lan</span>
+                                Network Nodes
+                            </button>
+                            <button onclick="window.location.href='ml_models.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">psychology</span>
+                                ML Models
+                            </button>
+                            <button onclick="window.location.href='policies.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">gavel</span>
+                                Policy Settings
+                            </button>
+                            <div class="border-t border-outline-variant/20 my-1 mx-4"></div>
+                            <button onclick="signOut()"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error/10 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">logout</span>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8 space-y-6 max-w-[1800px] mx-auto">
+
+            <!-- Bento Stats Grid (7 Cards) -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+                <!-- 1: Total Decisions -->
+                <div
+                    class="glass-panel p-4 rounded-xl border-t-2 border-t-primary hover:-translate-y-1 transition-transform group">
+                    <p class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1">Total Requests</p>
+                    <h3 class="font-headline text-2xl font-bold flex items-end gap-1"><span id="stat-decisions"
+                            class="group-hover:text-primary transition-colors">—</span></h3>
+                </div>
+                <!-- 2: Active Threats -->
+                <div
+                    class="glass-panel p-4 rounded-xl border-t-2 border-t-error hover:-translate-y-1 transition-transform group">
+                    <p class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1">Active Threats</p>
+                    <h3 class="font-headline text-2xl font-bold flex items-end gap-1"><span id="stat-threats"
+                            class="text-error group-hover:shadow-error transition-colors text-glow">—</span></h3>
+                </div>
+                <!-- 3: Agent Health -->
+                <div
+                    class="glass-panel p-4 rounded-xl border-t-2 border-t-tertiary hover:-translate-y-1 transition-transform group">
+                    <p class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1">Agent Health</p>
+                    <h3 class="font-headline text-2xl font-bold flex items-end gap-1"><span
+                            id="stat-health">—</span><span class="text-sm font-light">%</span></h3>
+                </div>
+                <!-- 4: Global Latency -->
+                <div
+                    class="glass-panel p-4 rounded-xl border-t-2 border-t-primary hover:-translate-y-1 transition-transform group">
+                    <p class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1">Avg Inference</p>
+                    <h3 class="font-headline text-2xl font-bold flex items-end gap-1"><span
+                            id="stat-latency">—</span><span class="text-sm font-light">ms</span></h3>
+                </div>
+                <!-- 5: Unique IPs -->
+                <div
+                    class="glass-panel p-4 rounded-xl border-t-2 border-t-secondary hover:-translate-y-1 transition-transform group">
+                    <p class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1">Unique IPs</p>
+                    <h3 class="font-headline text-2xl font-bold flex items-end gap-1"><span id="stat-ips"
+                            class="group-hover:text-secondary transition-colors">—</span></h3>
+                </div>
+                <!-- 6: Model Confidence -->
+                <div
+                    class="glass-panel p-4 rounded-xl border-t-2 border-t-tertiary hover:-translate-y-1 transition-transform group">
+                    <p class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1">Model Confidence</p>
+                    <h3 class="font-headline text-2xl font-bold flex items-end gap-1 text-tertiary"><span
+                            id="stat-confidence"
+                            class="group-hover:shadow-[0_0_15px_rgba(0,226,151,0.5)] transition-all">—</span><span
+                            class="text-sm font-light">%</span></h3>
+                </div>
+                <!-- 8: Attack Block Rate -->
+                <div
+                    class="glass-panel p-4 rounded-xl border-t-2 border-t-primary hover:-translate-y-1 transition-transform group">
+                    <p class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1 relative">Threat
+                        Block
+                        Rate <span class="absolute top-0 right-0 w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                    </p>
+                    <h3 class="font-headline text-2xl font-bold flex items-end gap-1"><span id="stat-abr"
+                            class="group-hover:text-primary transition-colors">—</span><span
+                            class="text-sm font-light">%</span></h3>
+                </div>
+            </section>
+
+            <!-- Main Data Canvas -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Column (Span 8) -->
+                <div class="lg:col-span-8 space-y-6 flex flex-col h-full">
+
+                    <!-- Network Throughput Chart -->
+                    <div class="glass-panel p-6 rounded-xl cyber-glow relative">
+                        <div class="flex justify-between items-center z-10 relative">
+                            <div>
+                                <h3 class="font-headline text-lg font-bold">Network Throughput</h3>
+                                <p class="text-xs text-secondary/60">Simulated network traffic — updates every 60 seconds</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="bg-surface-bright px-3 py-1 rounded text-xs">TCP/UDP</span>
+                                <span
+                                    class="bg-surface-bright px-3 py-1 rounded text-xs border border-error/50 text-error">Anomalies
+                                    Overlay</span>
+                            </div>
+                        </div>
+                        <div id="throughput-chart" class="-ml-2 mt-2 h-[260px]"></div>
+                    </div>
+
+                    <!-- Live Threat Feed Box -->
+                    <div class="glass-panel rounded-xl overflow-hidden flex flex-col flex-1 relative">
+                        <div
+                            class="px-6 py-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface-bright/50 shrink-0">
+                            <h3 class="font-headline text-md font-bold flex items-center gap-2">
+                                <span class="material-symbols-outlined text-error text-sm">radar</span> Live Threat Feed
+                            </h3>
+                            <span id="feed-status" class="text-[10px] font-mono text-secondary/40">Awaiting live threat events...</span>
+                        </div>
+                        <div class="flex-1 relative min-h-0">
+                            <div id="threat-feed"
+                                class="absolute inset-0 overflow-y-auto p-2 space-y-2 bg-[#060e20] custom-scrollbar">
+                                <!-- Feeds inserted via JS after Deploy Agent -->
+                                <div class="p-4 text-center text-secondary/30 text-xs font-mono" id="feed-placeholder">
+                                    <span
+                                        class="material-symbols-outlined text-2xl block mb-2 opacity-30">rocket_launch</span>
+                                    Deploy an agent to start the live feed
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Span 4) -->
+                <div class="lg:col-span-4 space-y-6 flex flex-col">
+
+                    <!-- Threat Donut -->
+                    <div class="glass-panel p-6 rounded-xl relative group">
+                        <h3 class="font-headline text-lg font-bold absolute top-6 left-6">Threat Profiles</h3>
+                        <div id="donut-chart"
+                            class="mt-8 flex justify-center scale-110 group-hover:scale-115 transition-transform"></div>
+                    </div>
+
+                    <!-- Multi-Model Threat Intelligence Engine -->
+                    <div class="glass-panel p-6 rounded-xl flex-1 flex flex-col relative overflow-hidden">
+                        <div
+                            class="absolute -right-10 -top-10 w-32 h-32 bg-tertiary/10 rounded-full blur-[40px] pointer-events-none">
+                        </div>
+
+                        <h3 class="font-headline text-lg font-bold text-tertiary mb-1">Multi-Model Threat Intelligence
+                            Engine</h3>
+                        <p
+                            class="text-[10px] text-secondary/70 mb-5 leading-relaxed border-b border-outline-variant/30 pb-4">
+                            Select a model and dataset to view live classification metrics and confidence scores.
+                        </p>
+
+                        <div class="mb-5">
+                            <p class="text-[10px] uppercase text-secondary/60 mb-2 font-bold tracking-wider">Active
+                                Ensemble Matrix</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button id="btn-xgboost" onclick="switchModel('xgboost')"
+                                    class="px-3 py-1.5 bg-primary/20 text-primary border border-primary/50 rounded text-[10px] font-bold shadow-[0_0_10px_rgba(0,218,243,0.3)] transition-all flex items-center gap-1"><span
+                                        id="dot-xgboost"
+                                        class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse transition-all"></span>
+                                    XGBoost</button>
+                                <button id="btn-rf" onclick="switchModel('rf')"
+                                    class="px-3 py-1.5 bg-surface-bright border border-outline-variant/30 text-secondary rounded text-[10px] hover:text-white transition-all flex items-center gap-1"><span
+                                        id="dot-rf" class="hidden"></span> Random Forest</button>
+                                <button id="btn-lr" onclick="switchModel('lr')"
+                                    class="px-3 py-1.5 bg-surface-bright border border-outline-variant/30 text-secondary rounded text-[10px] hover:text-white transition-all flex items-center gap-1"><span
+                                        id="dot-lr" class="hidden"></span> Logistic Regression</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-5 border-b border-outline-variant/20 pb-4">
+                            <p class="text-[10px] uppercase text-secondary/60 mb-2 font-bold tracking-wider">Active
+                                Dataset Stream <span
+                                    class="float-right text-[8px] text-primary animate-pulse">LIVE</span></p>
+                            <div class="flex gap-2 relative z-20">
+                                <button id="btn-ds-unsw" onclick="switchDataset('unsw')"
+                                    class="px-3 py-1.5 bg-primary/20 text-primary border border-primary/50 rounded text-[10px] font-bold shadow-[0_0_10px_rgba(0,218,243,0.3)] transition-all flex items-center gap-1"><span
+                                        id="dot-ds-unsw"
+                                        class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse transition-all"></span>
+                                    UNSW-NB15</button>
+                                <button id="btn-ds-cicids" onclick="switchDataset('cicids')"
+                                    class="px-3 py-1.5 bg-surface-bright border border-outline-variant/30 text-secondary rounded text-[10px] hover:text-white transition-all flex items-center gap-1"><span
+                                        id="dot-ds-cicids"
+                                        class="w-1.5 h-1.5 rounded-full bg-secondary transition-all"></span>
+                                    CIC-IDS-2017</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-2 mb-5 flex-1 text-[11px] font-mono relative">
+                            <div class="flex justify-between border-b border-outline-variant/10 pb-1"><span
+                                    class="text-secondary/70 font-body uppercase text-[9px]">Precision</span> <span
+                                    id="metric-precision" class="text-tertiary font-bold transition-all">—</span>
+                            </div>
+                            <div class="flex justify-between border-b border-outline-variant/10 pb-1"><span
+                                    class="text-secondary/70 font-body uppercase text-[9px]">False Positive Rate</span>
+                                <span id="metric-fpr" class="transition-all">—</span>
+                            </div>
+                            <div class="flex justify-between border-b border-outline-variant/10 pb-1"><span
+                                    class="text-secondary/70 font-body uppercase text-[9px]">Recall</span> <span
+                                    id="metric-recall" class="transition-all">—</span></div>
+                            <div class="flex justify-between border-b border-outline-variant/10 pb-1"><span
+                                    class="text-secondary/70 font-body uppercase text-[9px]">Accuracy</span> <span
+                                    id="metric-drift" class="text-tertiary font-bold transition-all">—</span></div>
+                            <div class="flex justify-between border-b border-outline-variant/10 pb-1"><span
+                                    class="text-secondary/70 font-body uppercase text-[9px]">F1 Score</span> <span
+                                    id="metric-f1" class="transition-all">—</span></div>
+                            <div class="flex justify-between border-b border-outline-variant/10 pb-1"><span
+                                    class="text-secondary/70 font-body uppercase text-[9px]">Inference Latency</span>
+                                <span id="metric-latency" class="transition-all">—</span>
+                            </div>
+                            <div class="col-span-2 flex justify-between mt-1"><span
+                                    class="text-secondary/70 font-body uppercase text-[9px]">Ensemble Confidence</span>
+                                <span id="metric-confidence"
+                                    class="text-primary font-bold text-xs transition-all">—</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-outline-variant/30">
+                            <p
+                                class="text-[10px] text-secondary/70 uppercase mb-2 font-bold tracking-wider flex justify-between">
+                                Model Confidence Spread <span>(Live)</span></p>
+                            <div class="space-y-1.5 ">
+                                <div class="flex items-center gap-2"><span
+                                        class="text-[9px] w-20 text-right font-mono">XGBoost</span>
+                                    <div class="flex-1 h-1.5 bg-surface rounded-full overflow-hidden">
+                                        <div id="bar-xgboost"
+                                            class="h-full bg-primary shadow-[0_0_5px_rgba(0,218,243,0.8)] transition-all duration-500"
+                                            style="width: 0%"></div>
+                                    </div><span id="spread-xgboost"
+                                        class="text-[11px] w-10 font-mono font-bold text-primary">—</span>
+                                </div>
+                                <div class="flex items-center gap-2"><span
+                                        class="text-[9px] w-20 text-right font-mono">RandForest</span>
+                                    <div class="flex-1 h-1.5 bg-surface rounded-full overflow-hidden">
+                                        <div id="bar-rf" class="h-full bg-secondary transition-all duration-500"
+                                            style="width: 0%"></div>
+                                    </div><span id="spread-rf"
+                                        class="text-[11px] w-10 font-mono font-bold text-secondary">—</span>
+                                </div>
+                                <div class="flex items-center gap-2"><span
+                                        class="text-[9px] w-20 text-right font-mono">Logistic Reg</span>
+                                    <div class="flex-1 h-1.5 bg-surface rounded-full overflow-hidden">
+                                        <div id="bar-lr" class="h-full bg-outline-variant transition-all duration-500"
+                                            style="width: 0%"></div>
+                                    </div><span id="spread-lr"
+                                        class="text-[11px] w-10 font-mono font-bold text-secondary/70">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Autonomous Pipeline -->
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="font-headline text-lg font-bold text-primary mb-4">Response Pipeline</h3>
+                        <div class="relative space-y-3 pl-4">
+                            <div class="absolute left-1.5 top-2 bottom-1.5 w-px bg-outline-variant/30">
+                                <div id="pipeline-wire" class="w-full bg-primary transition-all duration-500 h-0"></div>
+                            </div>
+                            <div class="flex items-center gap-3 relative z-10" id="step-1"><span
+                                    class="w-3 h-3 rounded-full bg-outline-variant outline outline-4 outline-background step-dot"></span><span
+                                    class="text-xs uppercase font-bold text-secondary step-text">Suspicious
+                                    Packet Detected</span></div>
+                            <div class="flex items-center gap-3 relative z-10" id="step-2"><span
+                                    class="w-3 h-3 rounded-full bg-outline-variant outline outline-4 outline-background step-dot"></span><span
+                                    class="text-xs uppercase font-bold text-secondary step-text">ML Model
+                                    Classification</span></div>
+                            <div class="flex items-center gap-3 relative z-10" id="step-3"><span
+                                    class="w-3 h-3 rounded-full bg-outline-variant outline outline-4 outline-background step-dot"></span><span
+                                    class="text-xs uppercase font-bold text-secondary step-text">LangChain Agent
+                                    Decision</span>
+                            </div>
+                            <div class="flex items-center gap-3 relative z-10" id="step-4"><span
+                                    class="w-3 h-3 rounded-full bg-outline-variant outline outline-4 outline-background step-dot"></span><span
+                                    class="text-xs uppercase font-bold text-secondary step-text">Response Action Executed</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Intrusion Events Table -->
+            <section
+                class="glass-panel rounded-xl overflow-hidden hover:-translate-y-1 transition-transform duration-300">
+                <div class="px-6 py-4 flex justify-between items-center bg-surface-bright/40">
+                    <h3 class="font-headline text-lg font-bold flex items-center gap-2"><span
+                            class="material-symbols-outlined text-primary text-xl">policy</span> Recent Intrusion Events
+                    </h3>
+                    <div class="flex gap-2">
+                        <button onclick="exportFullLogs()"
+                            class="text-xs bg-surface px-3 py-1 rounded border border-outline-variant/30 hover:border-primary transition-colors flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[12px]">download</span>
+                            Export CSV
+                        </button>
+                        <a href="log_archives.html"
+                            class="text-xs bg-primary/20 text-primary px-3 py-1 rounded border border-primary/50 hover:bg-primary/40 transition-colors flex items-center gap-1">
+                            View Full Archive
+                            <span class="material-symbols-outlined text-[12px]">open_in_new</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="sticky top-0 z-10">
+                            <tr class="bg-[#060e20] text-secondary/70 text-[10px] uppercase tracking-wider font-bold">
+                                <th class="px-6 py-3">Time</th>
+                                <th class="px-6 py-3">Source IP</th>
+                                <th class="px-6 py-3">Attack Category</th>
+                                <th class="px-6 py-3">Severity</th>
+                                <th class="px-6 py-3">ML Confidence</th>
+                                <th class="px-6 py-3">Agent Action</th>
+                                <th class="px-6 py-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm font-medium" id="anomaly-table-body">
+                            <tr>
+                                <td colspan="7" class="px-6 py-8 text-center text-secondary/30 font-mono text-xs">
+                                    Loading intrusion events from backend...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Deploy Agent Modal -->
+    <div id="deploy-modal"
+        class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm">
+        <div class="glass-panel border border-primary/40 rounded-xl w-full max-w-lg shadow-[0_0_50px_rgba(0,218,243,0.12)] relative transform transition-all scale-95 opacity-0 duration-300"
+            id="modal-content" style="max-height:90vh;overflow-y:auto;">
+
+                        <!-- Header -->
+                        <div
+                            class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-outline-variant/20">
+                            <h2 class="text-lg font-bold font-headline flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary"
+                                    style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">rocket_launch</span>
+                                Configure &amp; Deploy Agent
+                            </h2>
+                            <button onclick="toggleModal('deploy-modal')"
+                                class="text-secondary/50 hover:text-white transition-colors">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <div class="px-6 py-5 space-y-5">
+
+                            <!-- AGENT ROLE -->
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold text-secondary/70 tracking-wider mb-2 flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-primary text-sm"
+                                        style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">manage_accounts</span>
+                                    Agent Role
+                                </label>
+                                <select id="agent-role" onchange="onRoleChange()"
+                                    class="w-full bg-surface border border-outline-variant/30 rounded-lg p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors">
+                                    <option value="dpi">Deep Packet Inspector (DPI)</option>
+                                    <option value="monitor">Normal Traffic Monitor</option>
+                                    <option value="ddos">DDoS Sentinel</option>
+                                    <option value="auth">Auth Monitor</option>
+                                    <option value="recon">Reconnaissance Detector</option>
+                                </select>
+                                <!-- Role description -->
+                                <p class="mt-1.5 text-[10px] text-secondary/50 font-mono" id="role-desc">
+                                    Inspects standard TCP/HTTP flows — expects ALLOW or MONITOR
+                                </p>
+                            </div>
+
+                            <!-- DATASET -->
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold text-secondary/70 tracking-wider mb-2 flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-tertiary text-sm"
+                                        style="font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">dataset</span>
+                                    Dataset
+                                </label>
+                                <div class="flex gap-2" id="dataset-btns">
+                                    <button id="ds-unsw" onclick="setDataset('unsw')"
+                                        class="flex-1 py-2.5 px-3 rounded-lg border-2 border-primary bg-primary/10 text-primary text-xs font-bold transition-all">
+                                        <div class="font-headline">UNSW-NB15</div>
+                                        <div class="text-[10px] font-normal opacity-70">Intrusion detection dataset</div>
+                                    </button>
+                                    <button id="ds-cic" onclick="setDataset('cic')"
+                                        class="flex-1 py-2.5 px-3 rounded-lg border-2 border-outline-variant/30 text-secondary/60 text-xs transition-all hover:border-primary/40 hover:text-white">
+                                        <div class="font-headline">CIC-IDS-2017</div>
+                                        <div class="text-[10px] font-normal opacity-70">Attack classification dataset</div>
+                                    </button>
+                                </div>
+                                <p class="mt-1.5 text-[10px] text-secondary/50 font-mono">Agent autonomously selects
+                                    best ML model per request</p>
+                            </div>
+
+                            <!-- ZONE / IP -->
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold text-secondary/70 tracking-wider mb-2 flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-secondary text-sm">location_on</span>
+                                    Zone
+                                </label>
+                                <select id="agent-zone"
+                                    class="w-full bg-surface border border-outline-variant/30 rounded-lg p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors">
+                                    <option value="us-east">US-East &mdash; 192.168.1.x</option>
+                                    <option value="eu-central">EU-Central &mdash; 10.0.0.x</option>
+                                    <option value="apac">APAC &mdash; 172.16.0.x</option>
+                                </select>
+                                <p class="mt-1.5 text-[10px] text-secondary/50 font-mono" id="zone-desc">IP range used in selected dataset</p>
+                            </div>
+
+                            <!-- SIMULATION INTERVAL -->
+                            <div>
+                                <label
+                                    class="block text-[10px] uppercase font-bold text-secondary/70 tracking-wider mb-2">
+                                    Simulation Interval
+                                </label>
+                                <div class="flex gap-2">
+                                    <button onclick="setInterval_(0)" id="iv-0"
+                                        class="interval-btn flex-1 py-2 rounded border border-primary bg-primary/10 text-primary text-[11px] font-bold">Single</button>
+                                    <button onclick="setInterval_(5)" id="iv-5"
+                                        class="interval-btn flex-1 py-2 rounded border border-outline-variant/30 text-secondary/60 text-[11px] hover:border-primary/40 hover:text-white transition-all">Every
+                                        5s</button>
+                                    <button onclick="setInterval_(10)" id="iv-10"
+                                        class="interval-btn flex-1 py-2 rounded border border-outline-variant/30 text-secondary/60 text-[11px] hover:border-primary/40 hover:text-white transition-all">Every
+                                        10s</button>
+                                    <button onclick="setInterval_(30)" id="iv-30"
+                                        class="interval-btn flex-1 py-2 rounded border border-outline-variant/30 text-secondary/60 text-[11px] hover:border-primary/40 hover:text-white transition-all">Every
+                                        30s</button>
+                                </div>
+                            </div>
+
+                            <!-- LAUNCH BUTTON -->
+                            <button id="launch-btn" onclick="handleDeploy()"
+                                class="w-full py-3.5 bg-primary text-[#00363d] rounded-lg font-bold font-headline flex items-center justify-center gap-2 hover:bg-[#9cf0ff] hover:shadow-[0_0_20px_rgba(0,218,243,0.4)] transition-all">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;">rocket_launch</span>
+                                Initialize Launch
+                            </button>
+
+                            <!-- RESULT PANEL -->
+                            <div id="deploy-result"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toast Notification -->
+                <div id="toast"
+                    class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-tertiary/20 border border-tertiary text-tertiary px-6 py-4 rounded-lg flex items-center gap-3 z-[110] shadow-[0_0_20px_rgba(0,226,151,0.2)] transition-all duration-300">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span class="text-sm font-bold tracking-wide">Agent Deployed Successfully!</span>
+                </div>
+
+                <!-- Logic -->
+                <script>
+                    // ── CONSTANTS ──────────────────────────────────────────────
+                    const API = 'http://127.0.0.1:8000';
+                    const WS_URL = 'ws://127.0.0.1:8000/ws/feed';
+                    let agentDeployed = false;
+                    let wsConnection = null;
+                    let storedMetrics = null;
+                    let donutChart = null;
+                    let refreshIntervals = [];
+                    let simulatorInterval = null;
+                    let deployConfig = null; // stores selected role/zone/dataset/model/interval
+
+                    const zonePrefixes = {
+                        'us-east': '192.168.1.',
+                        'eu-central': '10.0.0.',
+                        'apac': '172.16.0.'
+                    };
+
+                    // Generate a fresh IP that has no history in the system
+                    function getFreshIP(zone) {
+                        const prefix = {
+                            'us-east': '192.168.1',
+                            'eu-central': '10.0.0',
+                            'apac': '172.16.0'
+                        }[zone] || '192.168.1';
+                        // Use high-range IPs (200-254) unlikely to have prior block history
+                        const suffix = Math.floor(Math.random() * 54) + 200;
+                        return `${prefix}.${suffix}`;
+                    }
+
+                    // ── MODAL & TOAST ──────────────────────────────────────────
+                    function toggleModal(id) {
+                        const modal = document.getElementById(id);
+                        const content = document.getElementById('modal-content');
+                        if (modal.classList.contains('hidden')) {
+                            modal.classList.remove('hidden');
+                            setTimeout(() => { content.classList.remove('scale-95', 'opacity-0'); }, 10);
+                        } else {
+                            content.classList.add('scale-95', 'opacity-0');
+                            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+                        }
+                    }
+
+                    function showToast(msg, isError = false) {
+                        const toast = document.getElementById('toast');
+                        const icon = toast.querySelector('.material-symbols-outlined');
+                        const text = toast.querySelector('span:last-child');
+                        text.textContent = msg;
+                        if (isError) {
+                            toast.className = toast.className.replace(/tertiary/g, 'error');
+                            icon.textContent = 'error';
+                        } else {
+                            toast.className = "fixed bottom-6 right-6 transform bg-tertiary/20 border border-tertiary text-tertiary px-6 py-4 rounded-lg flex items-center gap-3 z-[110] shadow-[0_0_20px_rgba(0,226,151,0.2)] transition-all duration-300";
+                            icon.textContent = 'check_circle';
+                        }
+                        toast.classList.remove('translate-y-20', 'opacity-0');
+                        setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 4000);
+                    }
+
+                    // ── MODAL ROLE/DATASET/INTERVAL HELPERS ────────────────────
+                    let _selectedDataset = 'unsw';
+                    let _selectedInterval = 5000;
+
+                    const ROLE_DESCS = {
+                        dpi: 'Inspects TCP/HTTP flows — high packet inspection load',
+                        monitor: 'Baseline traffic monitor — expects mostly ALLOW/WATCHLIST',
+                        ddos: 'DDoS flood simulator — expects BLOCK responses',
+                        auth: 'Auth brute-force detector — expects ALERT/BLOCK',
+                        recon: 'Reconnaissance & port-scan detector'
+                    };
+
+                    function onRoleChange() {
+                        const role = document.getElementById('agent-role')?.value;
+                        const desc = document.getElementById('role-desc');
+                        if (desc && role) desc.textContent = ROLE_DESCS[role] || '';
+                    }
+
+                    function setDataset(ds) {
+                        _selectedDataset = ds;
+                        ['unsw', 'cic'].forEach(d => {
+                            const btn = document.getElementById('ds-' + d);
+                            if (!btn) return;
+                            if (d === ds) {
+                                btn.className = 'flex-1 py-2.5 px-3 rounded-lg border-2 border-primary bg-primary/10 text-primary text-xs font-bold transition-all';
+                            } else {
+                                btn.className = 'flex-1 py-2.5 px-3 rounded-lg border-2 border-outline-variant/30 text-secondary/60 text-xs transition-all hover:border-primary/40 hover:text-white';
+                            }
+                        });
+                    }
+
+                    function setInterval_(sec) {
+                        _selectedInterval = sec === 0 ? 0 : sec * 1000;
+                        document.querySelectorAll('.interval-btn').forEach(b => {
+                            b.className = 'interval-btn flex-1 py-2 rounded border border-outline-variant/30 text-secondary/60 text-[11px] hover:border-primary/40 hover:text-white transition-all';
+                        });
+                        const active = document.getElementById('iv-' + sec);
+                        if (active) active.className = 'interval-btn flex-1 py-2 rounded border border-primary bg-primary/10 text-primary text-[11px] font-bold';
+                    }
+
+                    // ── DEPLOY AGENT ───────────────────────────────────────────
+                    async function handleDeploy() {
+                        // Read field IDs matching the modal HTML
+                        const role = document.getElementById('agent-role')?.value || 'dpi';
+                        const zone = document.getElementById('agent-zone')?.value || 'us-east';
+                        const dataset = _selectedDataset;
+                        const interval = _selectedInterval;
+
+                        // Store config globally for the simulator
+                        deployConfig = { role, zone, dataset, model: 'auto', interval };
+
+                        const rolePayloads = {
+                            'dpi': { proto: 'tcp', sbytes: 1200, dbytes: 400, dur: 0.05 },
+                            'monitor': { proto: 'tcp', sbytes: 380, dbytes: 200, dur: 0.05, attack_cat: 'Normal' },
+                            'ddos': { proto: 'tcp', sbytes: 999999, dbytes: 0, Spkts: 5000, sloss: 200 },
+                            'auth': { proto: 'tcp', sbytes: 350, Spkts: 200, attack_cat: 'Brute Force' },
+                            'recon': { proto: 'tcp', sbytes: 80, Spkts: 1000, attack_cat: 'Reconnaissance' }
+                        };
+
+                        const srcip = (role === 'monitor' || role === 'dpi')
+                            ? getFreshIP(zone)
+                            : (zonePrefixes[zone] + Math.floor(Math.random() * 254 + 1));
+
+                        const payload = { ...rolePayloads[role], srcip };
+
+                        const submitBtn = document.getElementById('launch-btn');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin" style="font-size:18px">refresh</span> Initializing...';
+                        submitBtn.classList.add('opacity-60');
+
+                        let deployOk = false;
+                        try {
+                            const r = await fetch(`${API}/predict/`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ data: payload, dataset })
+                            });
+
+                            if (r.ok) {
+                                const result = await r.json();
+                                const decColors = { BLOCK: '#ffb4ab', ALERT: '#fbbf24', MONITOR: '#00daf3', ALLOW: '#00e297' };
+                                const color = decColors[result.decision] || '#b0c9e8';
+
+                                document.getElementById('deploy-result').innerHTML = `
+                        <div class="mt-4 p-4 rounded-lg border" style="border-color:${color}44;background:#060e20">
+                            <div class="text-[10px] uppercase tracking-widest text-secondary/60 font-bold mb-3">✓ Agent Response — Simulator Starting</div>
+                            <div class="space-y-2 text-xs font-mono">
+                                <div class="flex justify-between"><span class="text-secondary/50">Prediction</span><span class="font-bold">${result.prediction}</span></div>
+                                <div class="flex justify-between"><span class="text-secondary/50">Confidence</span><span class="font-bold">${(result.confidence * 100).toFixed(1)}%</span></div>
+                                <div class="flex justify-between"><span class="text-secondary/50">Decision</span><span class="font-bold" style="color:${color}">${result.decision}</span></div>
+                                <div class="flex justify-between"><span class="text-secondary/50">Model</span><span class="font-bold">${result.selected_model || result.model || '—'}</span></div>
+                                <div class="flex justify-between"><span class="text-secondary/50">Simulator</span><span class="font-bold text-tertiary">${interval === 0 ? 'Single-shot' : 'Every ' + interval/1000 + 's'} — ${role.toUpperCase()} / ${dataset.toUpperCase()}</span></div>
+                                <div class="mt-2 pt-2 border-t border-outline-variant/20">
+                                    <span class="text-secondary/50 block mb-1">Reason</span>
+                                    <span class="text-secondary/80 text-[10px] leading-relaxed">${(result.reason || '').substring(0, 300)}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                                deployOk = true;
+                            }
+                        } catch (err) { }
+
+                        if (!deployOk) {
+                            document.getElementById('deploy-result').innerHTML = `
+                    <div class="mt-3 p-3 rounded-lg border border-yellow-400/30 bg-yellow-400/5 text-[11px] font-mono text-yellow-400">
+                        ⚠ Backend offline — simulator active using: ${role.toUpperCase()} / ${dataset.toUpperCase()} / ${zone}
+                    </div>`;
+                        }
+
+                        agentDeployed = true;
+                        localStorage.setItem('auto_start_agent', 'true');
+                        activateLiveFeed();
+                        if (interval > 0) startTrafficSimulator();
+                        else sendSimulatedPacket();
+                        showToast('Agent Deployed — Live Feed Active!');
+
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px">check_circle</span> Deployed';
+                        submitBtn.classList.remove('opacity-60');
+                    }
+
+                    // ── ACTIVATE LIVE FEED (after deploy) ──────────────────────
+                    function activateLiveFeed() {
+                        const ph = document.getElementById('feed-placeholder');
+                        if (ph) ph.remove();
+                        const fs = document.getElementById('feed-status');
+                        if (fs) {
+                            fs.textContent = 'ACTIVE — streaming live events';
+                            fs.className = 'text-[10px] font-mono text-tertiary animate-pulse';
+                        }
+                        // Show Stop Agent button, style Deploy as secondary
+                        const btnDeploy = document.getElementById('btn-deploy-agent');
+                        const btnStop = document.getElementById('btn-stop-agent');
+                        if (btnDeploy) btnDeploy.className = 'w-full py-2.5 bg-surface border border-primary/40 text-primary rounded-md font-bold flex items-center justify-center gap-2 hover:bg-primary/10 transition-all text-sm';
+                        if (btnStop) btnStop.classList.remove('hidden');
+                        startAutoRefresh();
+                    }
+
+                    // ── STOP AGENT ──────────────────────────────────────────────
+                    function stopAgent() {
+                        agentDeployed = false; // Halt state immediately
+                        
+                        if (simulatorInterval) { 
+                            clearInterval(simulatorInterval); 
+                            simulatorInterval = null; 
+                        }
+                        
+                        // Clear all periodic refreshes (stats, latency, etc)
+                        if (window.refreshIntervals) {
+                            window.refreshIntervals.forEach(id => clearInterval(id));
+                            window.refreshIntervals = [];
+                        }
+                        
+                        deployConfig = null;
+                        
+                        // PERSISTENCE: Remember that the agent was manually stopped
+                        localStorage.setItem('auto_start_agent', 'false');
+
+                        const fs = document.getElementById('feed-status');
+                        if (fs) { 
+                            fs.textContent = 'SYSTEM HALTED — AGENT OFFLINE'; 
+                            fs.className = 'text-[10px] font-mono text-error font-bold'; 
+                        }
+
+                        const btnDeploy = document.getElementById('btn-deploy-agent');
+                        const btnStop = document.getElementById('btn-stop-agent');
+                        if (btnDeploy) { 
+                            btnDeploy.className = 'w-full py-3 bg-primary text-[#00363d] rounded-md font-bold flex items-center justify-center gap-2 hover:bg-[#9cf0ff] hover:shadow-[0_0_20px_rgba(0,218,243,0.5)] transition-all'; 
+                            btnDeploy.innerHTML = '<span class="material-symbols-outlined">rocket_launch</span> Deploy Agent'; 
+                        }
+                        if (btnStop) btnStop.classList.add('hidden');
+
+                        loadStats(); // Update dashboard with final counts
+                        showToast('AGENT TERMINATED: ALL PROCESSES HALTED', true);
+                    }
+
+                    // ── TRAFFIC SIMULATOR ─────────────────────────────────────
+                    // Continuously fires POST /predict/ using selected deploy config
+                    // so the WebSocket feed receives real threat_event messages.
+                    async function sendSimulatedPacket() {
+                        if (!deployConfig || !agentDeployed) return;
+
+                        // 40% normal, 60% attack — gives a realistic SOC mix
+                        const isNormal = Math.random() < 0.40;
+
+                        const attackVariants = {
+                            'monitor': [
+                                { proto: 'tcp', sbytes: 380, dbytes: 200, dur: 0.05, Spkts: 4, Dpkts: 3, sttl: 64, dttl: 128, attack_cat: 'Normal', description: 'Low-volume TCP — expects MONITOR' },
+                                { proto: 'tcp', sbytes: 1240, dbytes: 6800, dur: 0.12, Spkts: 6, Dpkts: 8, sttl: 64, dttl: 64, attack_cat: 'Normal', description: 'Standard HTTP browsing — expects ALLOW' }
+                            ],
+                            'dpi': [
+                                { proto: 'tcp', sbytes: 12800, dbytes: 400, dur: 0.05, Spkts: 18, Dpkts: 4, sload: 204800, dload: 6400, ct_state_ttl: 2 },
+                                { proto: 'udp', sbytes: 5000, dbytes: 200, dur: 0.02, Spkts: 8, Dpkts: 2, sload: 80000, dload: 3200, ct_state_ttl: 0 },
+                                { proto: 'tcp', sbytes: 24000, dbytes: 800, dur: 0.12, Spkts: 32, Dpkts: 6, sload: 384000, dload: 12800, ct_state_ttl: 2 }
+                            ],
+                            'ddos': [
+                                { proto: 'tcp', sbytes: 9999990, dbytes: 0, dur: 0.01, Spkts: 5000, Dpkts: 0, sloss: 200, sload: 9999990, ct_state_ttl: 0 },
+                                { proto: 'udp', sbytes: 5000000, dbytes: 0, dur: 0.01, Spkts: 8000, Dpkts: 0, sloss: 500, sload: 5000000, ct_state_ttl: 6 },
+                                { proto: 'tcp', sbytes: 999999, dbytes: 0, dur: 0.02, Spkts: 2000, Dpkts: 0, sloss: 100, sload: 999999, ct_state_ttl: 2 }
+                            ],
+                            'auth': [
+                                { proto: 'tcp', sbytes: 350, dbytes: 80, dur: 0.001, Spkts: 200, Dpkts: 50, attack_cat: 'Brute Force', ct_state_ttl: 2, sloss: 5 },
+                                { proto: 'tcp', sbytes: 180, dbytes: 40, dur: 0.001, Spkts: 100, Dpkts: 20, attack_cat: 'Password Spray', ct_state_ttl: 2, sloss: 2 },
+                                { proto: 'tcp', sbytes: 420, dbytes: 100, dur: 0.002, Spkts: 300, Dpkts: 80, attack_cat: 'Credential Stuffing', ct_state_ttl: 2, sloss: 8 }
+                            ],
+                            'recon': [
+                                { proto: 'tcp', sbytes: 80, dbytes: 0, dur: 0.001, Spkts: 1000, Dpkts: 0, attack_cat: 'Reconnaissance', sloss: 900, ct_state_ttl: 0 },
+                                { proto: 'icmp', sbytes: 40, dbytes: 40, dur: 0.001, Spkts: 500, Dpkts: 500, attack_cat: 'Port Scan', sloss: 0, ct_state_ttl: 0 },
+                                { proto: 'tcp', sbytes: 120, dbytes: 0, dur: 0.001, Spkts: 2000, Dpkts: 0, attack_cat: 'OS Fingerprint', sloss: 1800, ct_state_ttl: 0 }
+                            ]
+                        };
+
+                        // Normal traffic: realistic UNSW-NB15 / CIC-IDS-2017 "benign" feature ranges
+                        // label=0 explicitly, typical web/DNS/SSH session values
+                        const normalVariants = [
+                            { proto: 'tcp', sbytes: 540, dbytes: 3200, dur: 0.30, Spkts: 8, Dpkts: 12, sload: 14400, dload: 85333, ct_state_ttl: 5, sloss: 0, dloss: 0, label: 0 },
+                            { proto: 'udp', sbytes: 60, dbytes: 120, dur: 0.01, Spkts: 1, Dpkts: 1, sload: 48000, dload: 96000, ct_state_ttl: 6, sloss: 0, dloss: 0, label: 0 },
+                            { proto: 'tcp', sbytes: 240, dbytes: 1800, dur: 0.15, Spkts: 4, Dpkts: 6, sload: 12800, dload: 96000, ct_state_ttl: 5, sloss: 0, dloss: 0, label: 0 },
+                            { proto: 'tcp', sbytes: 800, dbytes: 5000, dur: 0.50, Spkts: 10, Dpkts: 15, sload: 12800, dload: 80000, ct_state_ttl: 5, sloss: 0, dloss: 0, label: 0 },
+                            { proto: 'tcp', sbytes: 120, dbytes: 480, dur: 0.08, Spkts: 2, Dpkts: 4, sload: 12000, dload: 48000, ct_state_ttl: 5, sloss: 0, dloss: 0, label: 0 },
+                            { proto: 'udp', sbytes: 85, dbytes: 200, dur: 0.02, Spkts: 2, Dpkts: 3, sload: 34000, dload: 80000, ct_state_ttl: 6, sloss: 0, dloss: 0, label: 0 },
+                            { proto: 'tcp', sbytes: 1200, dbytes: 8000, dur: 1.20, Spkts: 14, Dpkts: 22, sload: 8000, dload: 53333, ct_state_ttl: 5, sloss: 0, dloss: 0, label: 0 }
+                        ];
+
+                        const srcip = (deployConfig.role === 'monitor' || isNormal)
+                            ? getFreshIP(deployConfig.zone)
+                            : (zonePrefixes[deployConfig.zone] + Math.floor(Math.random() * 254 + 1));
+
+                        let variant;
+                        if (isNormal) {
+                            variant = normalVariants[Math.floor(Math.random() * normalVariants.length)];
+                        } else {
+                            const pool = attackVariants[deployConfig.role] || attackVariants['dpi'];
+                            variant = pool[Math.floor(Math.random() * pool.length)];
+                        }
+
+                        const payload = { ...variant, srcip };
+
+                        try {
+                            await fetch(`${API}/predict/`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ data: payload, dataset: deployConfig.dataset })
+                            });
+                        } catch (e) { /* backend offline */ }
+                    }
+
+                    function startTrafficSimulator() {
+                        // Stop any previous simulator
+                        if (simulatorInterval) { clearInterval(simulatorInterval); simulatorInterval = null; }
+
+                        const interval = deployConfig?.interval || 5000;
+                        // Fire first one immediately
+                        sendSimulatedPacket();
+                        // Then keep firing at selected interval
+                        simulatorInterval = setInterval(sendSimulatedPacket, interval);
+
+                        // Update feed status to show interval
+                        const fs = document.getElementById('feed-status');
+                        if (fs) {
+                            fs.textContent = `ACTIVE — firing every ${interval / 1000}s (${(deployConfig?.role || '').toUpperCase()}/${(deployConfig?.dataset || '').toUpperCase()})`;
+                            fs.className = 'text-[10px] font-mono text-tertiary';
+                        }
+                    }
+
+                    // ── STAT CARDS ─────────────────────────────────────────────
+                    async function loadStats() {
+                        try {
+                            const r = await fetch(`${API}/evaluation/summary`);
+                            if (r.ok) {
+                                const d = await r.json();
+                                // Support both field naming styles for resilience
+                                const total = d.total_requests ?? d.total_decisions ?? 0;
+                                setStatValue('stat-decisions', total);
+                                
+                                const actions = d.decision_distribution || {};
+                                const blocks = actions.BLOCK || 0;
+                                setStatValue('stat-threats', blocks);
+                                
+                                const ips = d.unique_ips ?? 0;
+                                setStatValue('stat-ips', ips);
+                                
+                                const abr = d.attack_block_rate !== undefined ? (d.attack_block_rate * 100).toFixed(1) : '0.0';
+                                const abrEl = document.getElementById('stat-abr');
+                                if (abrEl) abrEl.textContent = abr;
+                            }
+                        } catch (e) {
+                            console.error("[Stats] Failed to load summary:", e);
+                        }
+
+                        // Health
+                        try {
+                            const r = await fetch(`${API}/health`);
+                            if (r.ok) {
+                                const d = await r.json();
+                                document.getElementById('stat-health').textContent = d.agent === 'initialized' ? '99.9' : '0';
+                            }
+                        } catch (e) { }
+
+                        // Latency
+                        try {
+                            const r = await fetch(`${API}/metrics/latency`);
+                            if (r.ok) {
+                                const d = await r.json();
+                                const rfLat = d.random_forest?.mean_ms;
+                                if (rfLat !== undefined) document.getElementById('stat-latency').textContent = rfLat.toFixed(1);
+                            }
+                        } catch (e) { }
+
+                        // Model confidence from metrics
+                        try {
+                            if (!storedMetrics) {
+                                const r = await fetch(`${API}/metrics/`);
+                                if (r.ok) storedMetrics = await r.json();
+                            }
+                            if (storedMetrics) {
+                                const unsw = storedMetrics['UNSW-NB15'];
+                                if (unsw && unsw.random_forest) {
+                                    document.getElementById('stat-confidence').textContent = (unsw.random_forest.accuracy * 100).toFixed(1);
+                                }
+                            }
+                        } catch (e) { }
+                    }
+
+                    function setStatValue(id, val) {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        el.textContent = typeof val === 'number' ? val.toLocaleString() : val;
+                    }
+
+                    // ── THROUGHPUT CHART ───────────────────────────────────────
+                    const now = new Date();
+                    const cats = [];
+                    for (let i = 6; i >= 0; i--) {
+                        const d = new Date(now.getTime() - i * 5 * 60000);
+                        cats.push(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                    }
+
+                    let tpInbound = [310, 400, 280, 510, 420, 1090, 800];
+                    let tpOutbound = [110, 320, 150, 320, 340, 520, 410];
+
+                    const tpOptions = {
+                        series: [{ name: 'Inbound', data: [...tpInbound] }, { name: 'Outbound', data: [...tpOutbound] }],
+                        chart: { type: 'area', height: 260, toolbar: { show: false }, background: 'transparent', animations: { enabled: true, easing: 'linear', dynamicAnimation: { speed: 1000 } } },
+                        colors: ['#00daf3', '#b0c9e8'],
+                        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.0, stops: [0, 90, 100] } },
+                        dataLabels: { enabled: false },
+                        stroke: { curve: 'smooth', width: 2 },
+                        xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#8b90a0' } } },
+                        yaxis: { labels: { style: { colors: '#8b90a0' } } },
+                        grid: { borderColor: 'rgba(65, 71, 84, 0.2)', strokeDashArray: 4 },
+                        legend: { show: false },
+                        theme: { mode: 'dark' }
+                    };
+                    const tpChart = new ApexCharts(document.querySelector("#throughput-chart"), tpOptions);
+                    tpChart.render();
+
+                    // Auto-scroll throughput every 60s
+                    setInterval(() => {
+                        const current = new Date();
+                        const newCats = [];
+                        for (let i = 6; i >= 0; i--) {
+                            const d = new Date(current.getTime() - i * 5 * 60000);
+                            newCats.push(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                        }
+                        tpInbound.shift(); tpInbound.push(Math.floor(Math.random() * 800 + 200));
+                        tpOutbound.shift(); tpOutbound.push(Math.floor(Math.random() * 400 + 100));
+                        tpChart.updateOptions({ xaxis: { categories: newCats } });
+                        tpChart.updateSeries([{ data: [...tpInbound] }, { data: [...tpOutbound] }]);
+                    }, 60000);
+
+                    // ── DONUT CHART ────────────────────────────────────────────
+                    const donutOptions = {
+                        series: [1, 1, 1, 1],
+                        labels: ['BLOCK', 'ALERT', 'MONITOR', 'ALLOW'],
+                        chart: { type: 'donut', height: 220, background: 'transparent' },
+                        colors: ['#ffb4ab', '#fbbf24', '#00daf3', '#00e297'],
+                        stroke: { show: true, colors: ['#131b2e'], width: 3 },
+                        plotOptions: { pie: { donut: { size: '75%', labels: { show: true, name: { color: '#8b90a0' }, value: { color: '#dae2fd', fontSize: '24px', fontWeight: 'bold' }, total: { show: true, color: '#dae2fd', label: 'Decisions' } } } } },
+                        legend: { show: true, position: 'bottom', labels: { colors: '#8b90a0' }, fontSize: '11px', markers: { width: 8, height: 8 } },
+                        dataLabels: { enabled: false },
+                        theme: { mode: 'dark' }
+                    };
+                    donutChart = new ApexCharts(document.querySelector("#donut-chart"), donutOptions);
+                    donutChart.render();
+
+                    async function loadDonut() {
+                        try {
+                            const r = await fetch(`${API}/evaluation/summary`);
+                            if (r.ok) {
+                                const d = await r.json();
+                                const dd = d.decision_distribution || {};
+                                const series = [dd.BLOCK || 0, dd.ALERT || 0, dd.MONITOR || 0, dd.ALLOW || 0];
+                                if (series.some(v => v > 0)) {
+                                    donutChart.updateSeries(series);
+                                }
+                            }
+                        } catch (e) { }
+                    }
+
+                    // ── ML MODEL SWITCHER ──────────────────────────────────────
+                    let currentModel = 'xgboost';
+                    let currentDataset = 'unsw';
+
+                    const FALLBACK_METRICS = {
+                        'UNSW-NB15': {
+                            random_forest: { accuracy: 0.9958, precision: 0.9620, recall: 0.9506, f1: 0.9563, latency_ms: { mean_ms: 93.6 } },
+                            xgboost: { accuracy: 0.9947, precision: 0.9526, recall: 0.9376, f1: 0.9450, latency_ms: { mean_ms: 1.41 } },
+                            logistic_regression: { accuracy: 0.9911, precision: 0.9171, recall: 0.8979, f1: 0.9074, latency_ms: { mean_ms: 0.11 } }
+                        },
+                        'CIC-IDS-2017': {
+                            random_forest: { accuracy: 0.9949, precision: 0.9360, recall: 0.9010, f1: 0.9180, latency_ms: { mean_ms: 93.6 } },
+                            xgboost: { accuracy: 0.9921, precision: 0.9510, recall: 0.9280, f1: 0.9390, latency_ms: { mean_ms: 1.41 } },
+                            logistic_regression: { accuracy: 0.9890, precision: 0.8920, recall: 0.8540, f1: 0.8710, latency_ms: { mean_ms: 0.11 } }
+                        }
+                    };
+
+                    const modelKeyMap = { xgboost: 'xgboost', rf: 'random_forest', lr: 'logistic_regression' };
+                    const dsKeyMap = { unsw: 'UNSW-NB15', cicids: 'CIC-IDS-2017' };
+
+                    function getModelMetric(dsKey, modelKey) {
+                        const live = storedMetrics?.[dsKey]?.[modelKey];
+                        if (live && typeof live === 'object') return live;
+                        return FALLBACK_METRICS[dsKey]?.[modelKey] || null;
+                    }
+
+                    async function loadMetricsOnce() {
+                        try {
+                            const r = await fetch(`${API}/metrics/`);
+                            if (r.ok) storedMetrics = await r.json();
+                        } catch (e) { }
+                        updateMetrics();
+                    }
+
+                    function switchDataset(dataset) {
+                        currentDataset = dataset;
+                        const btnUnsw = document.getElementById('btn-ds-unsw');
+                        const btnCicids = document.getElementById('btn-ds-cicids');
+                        [btnUnsw, btnCicids].forEach(el => {
+                            if (el) el.className = "px-3 py-1.5 bg-surface-bright border border-outline-variant/30 text-secondary rounded text-[10px] hover:text-white transition-all flex items-center gap-1";
+                        });
+                        const dotUnsw = document.getElementById('dot-ds-unsw');
+                        const dotCicids = document.getElementById('dot-ds-cicids');
+                        [dotUnsw, dotCicids].forEach(el => { if (el) el.className = "hidden"; });
+
+                        if (dataset === 'unsw') {
+                            if (btnUnsw) btnUnsw.className = "px-3 py-1.5 bg-primary/20 text-primary border border-primary/50 rounded text-[10px] font-bold shadow-[0_0_10px_rgba(0,218,243,0.3)] transition-all flex items-center gap-1";
+                            if (dotUnsw) dotUnsw.className = "w-1.5 h-1.5 rounded-full bg-primary animate-pulse transition-all";
+                        } else {
+                            if (btnCicids) btnCicids.className = "px-3 py-1.5 bg-primary/20 text-primary border border-primary/50 rounded text-[10px] font-bold shadow-[0_0_10px_rgba(0,218,243,0.3)] transition-all flex items-center gap-1";
+                            if (dotCicids) dotCicids.className = "w-1.5 h-1.5 rounded-full bg-primary animate-pulse transition-all";
+                        }
+                        updateMetrics();
+                    }
+
+                    function switchModel(model) {
+                        currentModel = model;
+                        ['xgboost', 'rf', 'lr'].forEach(m => {
+                            const btn = document.getElementById(`btn-${m}`);
+                            const dot = document.getElementById(`dot-${m}`);
+                            if (btn) btn.className = "px-3 py-1.5 bg-surface-bright border border-outline-variant/30 text-secondary rounded text-[10px] hover:text-white transition-all flex items-center gap-1";
+                            if (dot) dot.className = "hidden";
+                        });
+                        const activeBtn = document.getElementById(`btn-${model}`);
+                        const activeDot = document.getElementById(`dot-${model}`);
+                        if (activeBtn) activeBtn.className = "px-3 py-1.5 bg-primary/20 text-primary border border-primary/50 rounded text-[10px] font-bold shadow-[0_0_10px_rgba(0,218,243,0.3)] transition-all flex items-center gap-1";
+                        if (activeDot) activeDot.className = "w-1.5 h-1.5 rounded-full bg-primary animate-pulse transition-all";
+                        updateMetrics();
+                    }
+
+                    function updateMetrics() {
+                        const dsKey = dsKeyMap[currentDataset];
+                        const mKey = modelKeyMap[currentModel];
+                        const m = getModelMetric(dsKey, mKey);
+                        if (!m) return;
+
+                        document.getElementById('metric-precision').textContent = (m.precision * 100).toFixed(1) + '%';
+                        document.getElementById('metric-precision').className = 'text-tertiary font-bold transition-all';
+                        document.getElementById('metric-recall').textContent = (m.recall * 100).toFixed(1) + '%';
+                        document.getElementById('metric-f1').textContent = (m.f1 * 100).toFixed(1) + '%';
+                        document.getElementById('metric-drift').textContent = (m.accuracy * 100).toFixed(2) + '%';
+                        document.getElementById('metric-drift').className = 'text-tertiary font-bold transition-all';
+                        document.getElementById('metric-fpr').textContent = ((1 - m.precision) * 100).toFixed(3) + '%';
+                        document.getElementById('metric-latency').textContent = (m.latency_ms?.mean_ms || 0).toFixed(1) + 'ms';
+                        document.getElementById('metric-confidence').textContent = (m.accuracy * 100).toFixed(1) + '%';
+                        document.getElementById('metric-confidence').className = 'text-primary font-bold text-xs transition-all';
+
+                        // Confidence spread — all 3 models for current dataset
+                        ['xgboost', 'rf', 'lr'].forEach(mk => {
+                            const fullKey = modelKeyMap[mk];
+                            const mm = getModelMetric(dsKey, fullKey);
+                            if (!mm) return;
+                            const acc = (mm.accuracy * 100).toFixed(1);
+                            document.getElementById(`spread-${mk}`).textContent = acc + '%';
+                            document.getElementById(`bar-${mk}`).style.width = acc + '%';
+                        });
+                    }
+
+                    // ── WEBSOCKET ──────────────────────────────────────────────
+                    function connectWebSocket() {
+                        try {
+                            wsConnection = new WebSocket(WS_URL);
+                        } catch (e) {
+                            setWSStatus('offline');
+                            return;
+                        }
+
+                        wsConnection.onopen = () => {
+                            setWSStatus('connected');
+                        };
+
+                        wsConnection.onmessage = (e) => {
+                            try {
+                                const data = JSON.parse(e.data);
+                                if (data.type === 'threat_event' && agentDeployed) {
+                                    handleThreatEvent(data);
+                                }
+                            } catch (err) { }
+                        };
+
+                        wsConnection.onclose = () => {
+                            setWSStatus('reconnecting');
+                            setTimeout(connectWebSocket, 3000);
+                        };
+
+                        wsConnection.onerror = () => {
+                            setWSStatus('offline');
+                        };
+                    }
+
+                    function setWSStatus(status) {
+                        const dot = document.getElementById('ws-status-dot');
+                        const ping = document.getElementById('ws-status-ping');
+                        const text = document.getElementById('ws-status-text');
+                        if (!dot) return;
+
+                        if (status === 'connected') {
+                            dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-tertiary';
+                            if (ping) ping.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75';
+                            if (text) { text.textContent = 'WS Live'; text.className = 'text-[10px] uppercase tracking-wider text-tertiary font-bold'; }
+                        } else if (status === 'reconnecting') {
+                            dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-yellow-400';
+                            if (ping) ping.className = 'animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75';
+                            if (text) { text.textContent = 'Reconnecting'; text.className = 'text-[10px] uppercase tracking-wider text-yellow-400 font-bold'; }
+                        } else {
+                            dot.className = 'relative inline-flex rounded-full h-2 w-2 bg-outline-variant';
+                            if (ping) ping.className = 'hidden';
+                            if (text) { text.textContent = 'Offline'; text.className = 'text-[10px] uppercase tracking-wider text-outline-variant font-bold'; }
+                        }
+                    }
+
+                    // ── EXPORT FULL LOGS FROM MONGODB ──────────────────────────
+                    async function exportFullLogs() {
+                        try {
+                            showToast('Fetching logs from MongoDB...');
+                            const r = await fetch(`${API}/evaluation/decisions/all?limit=10000`);
+                            if (!r.ok) throw new Error('Backend failed');
+                            const data = await r.json();
+                            const records = data.records || [];
+
+                            if (records.length === 0) {
+                                showToast('No records found in MongoDB history', true);
+                                return;
+                            }
+
+                            const headers = ['Time', 'Source IP', 'Attack Category', 'Prediction', 'ML Confidence', 'Agent Action', 'Model Used', 'Reason'];
+                            const rows = [headers];
+
+                            records.forEach(r => {
+                                const time = r.timestamp ? new Date(r.timestamp).toLocaleString() : '—';
+                                const ip = r.srcip || '—';
+                                const attack = (r.raw_data && r.raw_data.attack_cat) || 'Normal';
+                                const pred = r.prediction || '—';
+                                const conf = r.confidence ? (r.confidence * 100).toFixed(1) + '%' : '—';
+                                const action = r.decision || '—';
+                                const model = r.model || '—';
+                                const reason = (r.reason || '').replace(/"/g, '""').replace(/\n/g, ' ');
+
+                                rows.push([
+                                    `"${time}"`,
+                                    `"${ip}"`,
+                                    `"${attack}"`,
+                                    `"${pred}"`,
+                                    `"${conf}"`,
+                                    `"${action}"`,
+                                    `"${model}"`,
+                                    `"${reason}"`
+                                ]);
+                            });
+
+                            const csv = rows.map(r => r.join(',')).join('\n');
+                            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `sentinel_full_history_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            showToast(`Exported ${records.length} records successfully!`);
+                        } catch (e) {
+                            console.error(e);
+                            showToast('Full export failed — falling back to visible rows', true);
+                            exportTableCSV(); // fallback
+                        }
+                    }
+
+                    function exportTableCSV() {
+                        const headers = ['Time', 'Source IP', 'Attack Category', 'Severity', 'ML Confidence', 'Agent Action', 'Status'];
+                        const rows = [headers];
+                        const tbody = document.getElementById('anomaly-table-body');
+                        if (!tbody) return;
+                        Array.from(tbody.querySelectorAll('tr:not(.drawer)')).forEach(tr => {
+                            const cells = Array.from(tr.querySelectorAll('td'));
+                            if (cells.length >= 7) {
+                                rows.push(cells.slice(0, 7).map(td => {
+                                    const txt = td.innerText.trim().replace(/,/g, ';').replace(/\n/g, ' ');
+                                    return `"${txt}"`;
+                                }));
+                            }
+                        });
+                        if (rows.length <= 1) { showToast('No events to export yet'); return; }
+                        const csv = rows.map(r => r.join(',')).join('\n');
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `sentinel_visible_log_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    }
+
+                    // ── THREAT EVENT HANDLER ───────────────────────────────────
+                    function playBlockSound() {
+                        try {
+                            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                            const osc = ctx.createOscillator();
+                            const gain = ctx.createGain();
+                            osc.connect(gain);
+                            gain.connect(ctx.destination);
+                            osc.type = 'square';
+                            osc.frequency.setValueAtTime(440, ctx.currentTime);
+                            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+                            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                            osc.start(ctx.currentTime);
+                            osc.stop(ctx.currentTime + 0.1);
+                        } catch (e) {}
+                    }
+
+                    function sendDesktopNotification(title, body) {
+                        if ("Notification" in window && Notification.permission === 'granted') {
+                            new Notification(title, { body: body });
+                        }
+                    }
+
+                    function handleThreatEvent(data) {
+                        const filter = localStorage.getItem('severity_filter') || 'all';
+                        const isBlock = data.decision === 'BLOCK';
+                        const isAlert = data.decision === 'ALERT';
+                        
+                        if (filter === 'blocks' && !isBlock && !isAlert) {
+                            return; // Filter out non-critical alerts if setting is enabled
+                        }
+                        
+                        addToThreatFeed(data);
+                        addToTable(data);
+                        animatePipeline(isBlock);
+                        loadDonut();
+                        
+                        if (isBlock) {
+                            if (localStorage.getItem('audio_alerts') === 'true') {
+                                playBlockSound();
+                            }
+                            if (localStorage.getItem('desktop_notifications') === 'true') {
+                                sendDesktopNotification("Sentinel Threat Blocked", `IP: ${data.srcip || 'Unknown'} - ${data.prediction || 'Malicious Activity'}`);
+                            }
+                        }
+                    }
+
+                    function addToThreatFeed(data) {
+                        const feed = document.getElementById('threat-feed');
+                        const isBlock = data.decision === 'BLOCK';
+                        const isAlert = data.decision === 'ALERT';
+                        const isMonitor = data.decision === 'MONITOR';
+                        const borderColor = isBlock ? 'border-error' : isAlert ? 'border-yellow-400' : isMonitor ? 'border-primary' : 'border-tertiary';
+                        const textColor = isBlock ? 'text-error' : isAlert ? 'text-yellow-400' : isMonitor ? 'text-primary' : 'text-tertiary';
+                        const badgeBg = isBlock ? 'bg-error/20 text-error' : isAlert ? 'bg-yellow-400/20 text-yellow-400' : isMonitor ? 'bg-primary/20 text-primary' : 'bg-tertiary/20 text-tertiary';
+                        const timeStr = new Date(data.timestamp || Date.now()).toLocaleTimeString();
+                        const reason = (data.reason || '').substring(0, 80);
+
+                        const div = document.createElement('div');
+                        div.className = `p-3 rounded border-l-2 bg-surface text-xs font-mono fade-in-down ${borderColor} ${isBlock ? 'cyber-glow-error' : ''}`;
+                        div.innerHTML = `
+                <div class="flex justify-between items-start mb-1">
+                    <span class="${textColor} font-bold">${data.srcip || '—'}</span>
+                    <span class="text-outline-variant">${timeStr}</span>
+                </div>
+                <div class="flex justify-between text-secondary mb-1">
+                    <span>${data.prediction || '—'} <span class="opacity-50">(${((data.confidence || 0) * 100).toFixed(1)}%)</span></span>
+                    <span class="${badgeBg} px-2 rounded uppercase text-[10px] font-bold">${data.decision}</span>
+                </div>
+                <div class="text-[10px] text-secondary/50 truncate">${reason}</div>`;
+                        feed.prepend(div);
+                        while (feed.children.length > 40) feed.lastChild.remove();
+                    }
+
+                    function addToTable(data) {
+                        const tb = document.getElementById('anomaly-table-body');
+                        // Remove "loading" placeholder if present
+                        if (tb.querySelector('td[colspan]')) tb.innerHTML = '';
+
+                        const isBlock = data.decision === 'BLOCK';
+                        const timeStr = new Date(data.timestamp || Date.now()).toLocaleTimeString();
+                        const severity = isBlock ? 'Critical' : (data.decision === 'ALERT' ? 'Warning' : 'Info');
+                        const statusMap = { BLOCK: 'Isolated', ALERT: 'Under Review', MONITOR: 'Monitoring', ALLOW: 'Cleared' };
+
+                        const paddingClass = localStorage.getItem('ui_density') === 'compact' ? 'py-1.5 text-xs' : 'py-4';
+
+                        const tr = document.createElement('tr');
+                        tr.className = "border-b border-outline-variant/20 hover:bg-white/5 transition-colors cursor-pointer";
+                        tr.innerHTML = `
+                <td class="px-6 ${paddingClass} font-mono text-outline-variant">${timeStr}</td>
+                <td class="px-6 ${paddingClass} font-bold ${isBlock ? 'text-error' : 'text-primary'}">${data.srcip || '—'}</td>
+                <td class="px-6 ${paddingClass}">${data.prediction || '—'}</td>
+                <td class="px-6 ${paddingClass}"><span class="px-2 py-1 rounded text-[10px] uppercase font-bold ${isBlock ? 'bg-error/20 text-error border border-error/50' : 'bg-secondary/20 text-secondary border border-secondary/50'}">${severity}</span></td>
+                <td class="px-6 ${paddingClass} text-secondary">${((data.confidence || 0) * 100).toFixed(1)}%</td>
+                <td class="px-6 ${paddingClass} uppercase text-[10px] tracking-wider font-bold">${data.decision}</td>
+                <td class="px-6 ${paddingClass} flex items-center gap-2"><span class="w-2 h-2 rounded-full ${isBlock ? 'bg-error animate-pulse' : 'bg-primary'}"></span>${statusMap[data.decision] || '—'}</td>`;
+
+                        tr.onclick = function () {
+                            const existing = this.nextElementSibling;
+                            if (existing && existing.classList.contains('drawer')) { existing.remove(); return; }
+                            const detail = document.createElement('tr');
+                            detail.className = "drawer bg-surface-bright/20 border-b border-primary/30";
+                            detail.innerHTML = `<td colspan="7" class="p-6 text-xs font-mono text-secondary"><div class="ml-4 border-l-2 border-primary/50 pl-4 space-y-2"><p>Model: ${data.model || '—'}</p><p>Decision: ${data.decision}</p><p>Reason: ${(data.reason || '').substring(0, 300)}</p></div></td>`;
+                            this.after(detail);
+                        };
+
+                        tb.prepend(tr);
+
+                        // FIFO — max 10 rows
+                        let mainRows = Array.from(tb.children).filter(row => !row.classList.contains('drawer'));
+                        while (mainRows.length > 10) {
+                            const oldest = mainRows.pop();
+                            const possibleDrawer = oldest.nextElementSibling;
+                            if (possibleDrawer && possibleDrawer.classList.contains('drawer')) possibleDrawer.remove();
+                            oldest.remove();
+                        }
+                    }
+
+                    // ── TABLE FROM BACKEND ─────────────────────────────────────
+                    async function loadTable() {
+                        try {
+                            const r = await fetch(`${API}/evaluation/memory/active`);
+                            if (!r.ok) return;
+                            const d = await r.json();
+                            const summaries = d.ip_summaries || {};
+                            const entries = Object.entries(summaries).slice(0, 10);
+                            if (!entries.length) return;
+
+                            const tb = document.getElementById('anomaly-table-body');
+                            tb.innerHTML = '';
+
+                            entries.forEach(([ip, s]) => {
+                                const isBlock = (s.blocks || 0) > 0;
+                                const severity = isBlock ? 'Critical' : ((s.alerts || 0) > 0 ? 'Warning' : 'Info');
+                                const action = isBlock ? 'BLOCK' : ((s.alerts || 0) > 0 ? 'ALERT' : 'MONITOR');
+                                const status = isBlock ? 'Isolated' : ((s.alerts || 0) > 0 ? 'Under Review' : 'Monitoring');
+                                const conf = s.avg_confidence ? (s.avg_confidence * 100).toFixed(1) + '%' : '—';
+                                const attackType = (s.attack_types && s.attack_types[0]) || 'Unknown';
+                                const lastSeen = s.last_seen ? new Date(s.last_seen).toLocaleTimeString() : '—';
+
+                                const paddingClass = localStorage.getItem('ui_density') === 'compact' ? 'py-1.5 text-xs' : 'py-4';
+
+                                const tr = document.createElement('tr');
+                                tr.className = "border-b border-outline-variant/20 hover:bg-white/5 transition-colors cursor-pointer";
+                                tr.innerHTML = `
+                        <td class="px-6 ${paddingClass} font-mono text-outline-variant">${lastSeen}</td>
+                        <td class="px-6 ${paddingClass} font-bold ${isBlock ? 'text-error' : 'text-primary'}">${ip}</td>
+                        <td class="px-6 ${paddingClass}">${attackType}</td>
+                        <td class="px-6 ${paddingClass}"><span class="px-2 py-1 rounded text-[10px] uppercase font-bold ${isBlock ? 'bg-error/20 text-error border border-error/50' : 'bg-secondary/20 text-secondary border border-secondary/50'}">${severity}</span></td>
+                        <td class="px-6 ${paddingClass} text-secondary">${conf}</td>
+                        <td class="px-6 ${paddingClass} uppercase text-[10px] tracking-wider font-bold">${action}</td>
+                        <td class="px-6 ${paddingClass} flex items-center gap-2"><span class="w-2 h-2 rounded-full ${isBlock ? 'bg-error animate-pulse' : 'bg-primary'}"></span>${status}</td>`;
+                                tb.appendChild(tr);
+                            });
+                        } catch (e) { }
+                    }
+
+                    // ── PIPELINE ANIMATION ─────────────────────────────────────
+                    function animatePipeline(isCrit) {
+                        const wire = document.getElementById('pipeline-wire');
+                        const dots = document.querySelectorAll('.step-dot');
+                        const texts = document.querySelectorAll('.step-text');
+                        if (!wire) return;
+
+                        wire.style.height = '0%';
+                        wire.className = 'w-full bg-primary transition-all duration-500 h-0';
+                        dots.forEach(d => { d.className = 'w-3 h-3 rounded-full bg-outline-variant outline outline-4 outline-background step-dot transition-all'; });
+                        texts.forEach(t => t.className = 'text-xs uppercase font-bold text-secondary step-text transition-all');
+
+                        setTimeout(() => { wire.style.height = '33%'; setStep(0, 'primary'); }, 500);
+                        setTimeout(() => { wire.style.height = '66%'; setStep(1, 'primary'); }, 1200);
+                        setTimeout(() => { wire.style.height = '100%'; setStep(2, 'primary'); }, 1800);
+                        setTimeout(() => {
+                            setStep(3, isCrit ? 'error' : 'tertiary');
+                            if (isCrit) wire.classList.replace('bg-primary', 'bg-error');
+                        }, 2500);
+                    }
+
+                    function setStep(idx, color) {
+                        const dots = document.querySelectorAll('.step-dot');
+                        const texts = document.querySelectorAll('.step-text');
+                        if (!dots[idx]) return;
+                        dots[idx].classList.replace('bg-outline-variant', `bg-${color}`);
+                        dots[idx].classList.add(`shadow-[0_0_10px_rgba(0,100,255,0.8)]`);
+                        texts[idx].classList.replace('text-secondary', `text-${color}`);
+                    }
+
+                    // ── AUTO REFRESH ───────────────────────────────────────────
+                    function startAutoRefresh() {
+                        if (refreshIntervals.length > 0) return; // already started
+                        // Stats + donut every 15s
+                        refreshIntervals.push(setInterval(() => { loadStats(); loadDonut(); }, 15000));
+                        // Table every 20s
+                        refreshIntervals.push(setInterval(loadTable, 20000));
+                    }
+
+                    // ── USER PROFILE DROPDOWN ─────────────────────────────────
+                    const _SESSION = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+
+                    if (_SESSION.username) {
+                        ['nav-username', 'dd-name'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.textContent = _SESSION.username;
+                        });
+                        const initials = (_SESSION.username || 'MA').slice(0, 2).toUpperCase();
+                        ['nav-avatar', 'dd-avatar'].forEach(id => {
+                            const el = document.getElementById(id);
+                            if (el) el.textContent = initials;
+                        });
+                    }
+                    if (_SESSION.email) {
+                        const el = document.getElementById('dd-email');
+                        if (el) el.textContent = _SESSION.email;
+                    }
+                    if (_SESSION.loginTime) {
+                        const el = document.getElementById('dd-login-time');
+                        if (el) el.textContent = 'Since ' + new Date(_SESSION.loginTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
+                    
+
+                    document.addEventListener('click', e => {
+                        const wrap = document.getElementById('user-menu-wrap');
+                        const dd = document.getElementById('profile-dropdown');
+                        if (wrap && !wrap.contains(e.target)) dd.classList.add('hidden');
+                    });
+
+                    
+
+                    // ── INIT ───────────────────────────────────────────────────
+                    loadStats();
+                    loadMetricsOnce();
+                    loadDonut();
+                    loadTable();
+                    connectWebSocket();
+                    
+                    if (localStorage.getItem('auto_start_agent') === 'true') {
+                        setTimeout(() => {
+                            if (!agentDeployed && typeof handleDeploy === 'function') {
+                                handleDeploy();
+                            }
+                        }, 1500);
+                    }
+                    // ── RADIO BUTTON STYLING (Dataset + ML) ───────────────────
+                    document.querySelectorAll('input[name="deploy-dataset"]').forEach(radio => {
+                        radio.addEventListener('change', function () {
+                            ['unsw', 'cic'].forEach(ds => {
+                                const lbl = document.getElementById('lbl-ds-' + ds);
+                                const rad = document.getElementById('radio-ds-' + ds);
+                                const inner = rad ? rad.querySelector('span') : null;
+                                if (this.value === ds) {
+                                    if (lbl) lbl.className = 'flex items-center gap-2 p-3 rounded-lg border border-primary/50 bg-primary/10 cursor-pointer transition-all';
+                                    if (rad) rad.className = 'w-3 h-3 rounded-full border-2 border-primary flex items-center justify-center';
+                                    if (inner) inner.className = 'w-1.5 h-1.5 rounded-full bg-primary';
+                                } else {
+                                    if (lbl) lbl.className = 'flex items-center gap-2 p-3 rounded-lg border border-outline-variant/30 bg-surface cursor-pointer transition-all';
+                                    if (rad) rad.className = 'w-3 h-3 rounded-full border-2 border-outline-variant flex items-center justify-center';
+                                    if (inner) inner.className = 'w-1.5 h-1.5 rounded-full bg-transparent';
+                                }
+                            });
+                        });
+                    });
+
+                    // Role hint tooltip for Configure Agent modal
+                    const roleHints = {
+                        'dpi': 'Inspects payload byte ratios and transfer sizes — catches data exfiltration & protocol abuse',
+                        'monitor': 'Low-noise normal traffic monitor — generates benign packets from fresh IPs to verify ALLOW/MONITOR responses',
+                        'ddos': 'Monitors volumetric packet floods — detects SYN/UDP floods and amplification attacks',
+                        'auth': 'Tracks repeated auth failures across IPs — catches brute force, spraying, and credential stuffing',
+                        'recon': 'Detects low-and-slow port sweeps, OS fingerprinting, and stealth scanning patterns'
+                    };
+                    function updateRoleHint(val) {
+                        const el = document.getElementById('role-hint');
+                        if (el) el.textContent = roleHints[val] || '';
+                    }
+                </script>
+
+    
+
+<script>
+
+        // ── GLOBAL SESSION POPULATION ─────────────────────────────────────────
+        const _GLOBAL_SESSION = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+        if (_GLOBAL_SESSION.username) {
+            ['nav-username', 'dd-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = _GLOBAL_SESSION.username; });
+            const ini = (_GLOBAL_SESSION.username || 'MA').slice(0, 2).toUpperCase();['nav-avatar', 'dd-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ini; });
+        }
+        if (_GLOBAL_SESSION.email) { const el = document.getElementById('dd-email'); if (el) el.textContent = _GLOBAL_SESSION.email; }
+        if (_GLOBAL_SESSION.loginTime) {
+            const el = document.getElementById('dd-login-time');
+            if (el) el.textContent = 'Since ' + new Date(_GLOBAL_SESSION.loginTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function toggleUserMenu() {
+            const dd = document.getElementById('profile-dropdown');
+            if (dd) dd.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', e => {
+            const wrap = document.getElementById('user-menu-wrap');
+            const dd = document.getElementById('profile-dropdown');
+            if (wrap && dd && !wrap.contains(e.target)) dd.classList.add('hidden');
+        });
+
+        function signOut() {
+            sessionStorage.removeItem('sentinel_user');
+            window.location.href = 'login.html';
+        }
+
+        // ── STRICT SESSION TIMEOUT ────────────────────────────────────────────
+        let _inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(_inactivityTimer);
+            if (localStorage.getItem('strict_session_timeout') === 'true') {
+                _inactivityTimer = setTimeout(() => {
+                    alert("Session timed out due to 15 minutes of inactivity.");
+                    signOut();
+                }, 15 * 60 * 1000); // 15 mins
+            }
+        }
+        if (localStorage.getItem('strict_session_timeout') === 'true') {
+            ['mousemove', 'keypress', 'scroll', 'click'].forEach(evt => document.addEventListener(evt, resetInactivityTimer));
+            resetInactivityTimer();
+        }
+
+</script>
+</body>
+
+</html>

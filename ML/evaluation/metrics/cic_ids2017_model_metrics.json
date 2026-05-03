@@ -1,0 +1,38 @@
+{
+    "random_forest": {
+        "accuracy": 0.9988,
+        "precision": 0.9971,
+        "recall": 0.9953,
+        "f1": 0.9962,
+        "train_time_seconds": 1364.02,
+        "latency_ms": {
+            "mean": 47.9754,
+            "p95": 71.4643,
+            "p99": 81.9548
+        }
+    },
+    "xgboost": {
+        "accuracy": 0.9992,
+        "precision": 0.9976,
+        "recall": 0.9974,
+        "f1": 0.9975,
+        "train_time_seconds": 130.37,
+        "latency_ms": {
+            "mean": 1.1562,
+            "p95": 2.0103,
+            "p99": 2.5227
+        }
+    },
+    "logistic_regression": {
+        "accuracy": 0.9721,
+        "precision": 0.9653,
+        "recall": 0.8506,
+        "f1": 0.9043,
+        "train_time_seconds": 2960.15,
+        "latency_ms": {
+            "mean": 0.4126,
+            "p95": 1.0534,
+            "p99": 1.5266
+        }
+    }
+}

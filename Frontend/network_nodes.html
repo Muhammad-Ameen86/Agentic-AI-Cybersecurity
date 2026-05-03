@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>The Sentinel | Network Nodes</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class", theme: {
+                extend: {
+                    colors: {
+              "on-primary-container": "#002f35",
+              "outline-variant": "#414754",
+              "on-secondary": "#19324b",
+              "secondary": "#b0c9e8",
+              "on-secondary-fixed": "#011d35",
+              "surface-container-high": "#222a3d",
+              "secondary-fixed-dim": "#b0c9e8",
+              "surface-dim": "#0b1326",
+              "surface-container-highest": "#2d3449",
+              "surface-container-lowest": "#060e20",
+              "outline": "#8b90a0",
+              "primary-fixed": "#9cf0ff",
+              "on-tertiary-container": "#00311d",
+              "surface-container": "#171f33",
+              "primary-container": "#009fb2",
+              "secondary-fixed": "#d1e4ff",
+              "on-primary-fixed-variant": "#004f58",
+              "surface-tint": "#00daf3",
+              "tertiary-fixed": "#4dffb2",
+              "background": "#0b1326",
+              "secondary-container": "#314863",
+              "inverse-primary": "#006875",
+              "tertiary-container": "#00a56d",
+              "tertiary": "#00e297",
+              "primary-fixed-dim": "#00daf3",
+              "on-primary": "#00363d",
+              "inverse-on-surface": "#283044",
+              "tertiary-fixed-dim": "#00e297",
+              "on-error-container": "#ffdad6",
+              "on-error": "#690005",
+              "surface-container-low": "#131b2e",
+              "on-secondary-container": "#9fb7d6",
+              "surface-bright": "#31394d",
+              "on-primary-fixed": "#001f24",
+              "on-tertiary-fixed-variant": "#005234",
+              "surface": "#0b1326",
+              "on-surface": "#dae2fd",
+              "on-tertiary-fixed": "#002112",
+              "error": "#ffb4ab",
+              "primary": "#00daf3",
+              "error-container": "#93000a",
+              "on-tertiary": "#003822",
+              "surface-variant": "#2d3449",
+              "on-surface-variant": "#c1c6d7",
+              "on-secondary-fixed-variant": "#314863",
+              "on-background": "#dae2fd",
+              "inverse-surface": "#dae2fd"
+            }, fontFamily: { headline: ["Space Grotesk"], body: ["Inter"] }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(19, 27, 46, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(65, 71, 84, 0.4);
+        }
+
+        .cyber-glow {
+            box-shadow: 0 0 20px rgba(0, 218, 243, 0.15);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .msf {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        .animate-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgba(0, 218, 243, 0.4), transparent);
+            opacity: 0.2;
+            animation: scanline 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        .node-pulse::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        .node-block::after {
+            background: rgba(255, 180, 171, 0.4);
+        }
+
+        .node-alert::after {
+            background: rgba(255, 179, 0, 0.4);
+        }
+
+        .node-safe::after {
+            background: rgba(0, 226, 151, 0.4);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1a2540;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.4s ease forwards;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            width: 280px;
+            z-index: 200;
+        }
+
+        .profile-dropdown.open {
+            display: block;
+        }
+    </style>
+
+    
+
+</head>
+
+<body class="bg-background text-white font-body overflow-x-hidden">
+    <div class="animate-scanline"></div>
+
+    <!-- SIDEBAR -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 z-[60] bg-[#02050b] border-r border-outline-variant/30 flex flex-col py-6">
+        <div class="px-6 mb-10">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/40 shadow-[0_0_15px_rgba(0,218,243,0.3)]">
+                    <span class="material-symbols-outlined msf text-primary" style="font-size:20px">shield</span>
+                </div>
+                <div>
+                    <h1 class="text-primary font-headline font-bold tracking-tight">The Sentinel</h1>
+                    <p class="text-[10px] text-secondary tracking-[0.2em] uppercase opacity-70">Sentinel Operations</p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="dashboard.html"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all">
+                <span class="material-symbols-outlined"
+                    style="font-size:20px">space_dashboard</span><span>Dashboard</span>
+            </a>
+            <a href="network_nodes.html"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary bg-primary/10 border-l-4 border-primary font-medium transition-all">
+                <span class="material-symbols-outlined msf" style="font-size:20px">lan</span><span>Network Nodes</span>
+            </a>
+            <a href="ml_models.html"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all">
+                <span class="material-symbols-outlined" style="font-size:20px">psychology</span><span>ML Models</span>
+            </a>
+            <a href="policies.html"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all">
+                <span class="material-symbols-outlined" style="font-size:20px">gavel</span><span>Policies</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all" href="settings.html">
+                <span class="material-symbols-outlined">settings</span><span>Settings</span>
+            </a>
+        </nav>
+        <div class="px-4 mt-auto">
+            <button onclick="window.location.href='dashboard.html'"
+                class="w-full py-3 bg-primary text-[#00363d] rounded-md font-bold flex items-center justify-center gap-2 hover:bg-[#9cf0ff] transition-all">
+                <span class="material-symbols-outlined" style="font-size:18px">rocket_launch</span> Go to Dashboard
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="ml-64 min-h-screen">
+
+        <!-- TOPBAR -->
+        <header
+            class="sticky top-0 z-50 flex justify-between items-center w-full px-8 py-4 backdrop-blur-md bg-background/80 border-b border-outline-variant/30">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <span
+                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant"
+                        style="font-size:18px">search</span>
+                    <input id="ip-search"
+                        class="bg-surface border border-outline-variant/30 focus:border-primary text-sm rounded-lg focus:ring-1 focus:ring-primary w-64 pl-10 py-2 placeholder:text-outline-variant/50"
+                        placeholder="Search IP address..." type="text" oninput="filterNodes(this.value)" />
+                </div>
+                <select id="status-filter" onchange="filterNodes()"
+                    class="bg-surface border border-outline-variant/30 text-sm rounded-lg px-3 py-2 text-secondary focus:border-primary">
+                    <option value="all">All Nodes</option>
+                    <option value="block">Blocked</option>
+                    <option value="alert">Alerted</option>
+                    <option value="safe">Safe / Allowed</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-5">
+                <div class="flex items-center gap-2 px-3 py-1 bg-surface rounded-full border border-outline-variant/30">
+                    <span class="relative flex h-2 w-2"><span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span><span
+                            class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span></span>
+                    <span class="text-[10px] uppercase tracking-wider text-tertiary font-bold">Live</span>
+                </div>
+                <!-- User dropdown -->
+                <div class="relative" id="user-menu-wrap">
+                    <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer select-none"
+                        onclick="toggleUserMenu()">
+                        <span class="text-right">
+                            <p class="text-xs font-bold leading-tight" id="nav-username">Muhammad Ameen</p>
+                            <p class="text-[10px] text-primary leading-tight">SOC Analyst</p>
+                        </span>
+                        <div class="w-9 h-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-sm"
+                            id="nav-avatar">MA</div>
+                    </div>
+
+                    <!-- Profile Dropdown Panel -->
+                    <div class="hidden absolute right-0 top-[calc(100%+8px)] w-[290px] z-[200] bg-[#02050b] rounded-xl shadow-2xl border border-outline-variant/40 overflow-hidden"
+                        id="profile-dropdown">
+                        <!-- User Info Header -->
+                        <div class="px-4 py-4 border-b border-outline-variant/30 bg-surface-container-lowest">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-base"
+                                    id="dd-avatar">MA</div>
+                                <div>
+                                    <p class="text-sm font-bold" id="dd-name">Muhammad Ameen</p>
+                                    <p class="text-[11px] text-primary font-mono" id="dd-email">analyst@sentinel.io</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse inline-block"></span>
+                                    <span class="text-[10px] font-mono text-tertiary uppercase tracking-widest">Session
+                                        Active</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-secondary/40" id="dd-login-time">—</span>
+                            </div>
+                        </div>
+                        <!-- Menu Items -->
+                        <div class="py-2">
+                            <button onclick="window.location.href=\'settings.html\'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">manage_accounts</span>
+                                Account Settings
+                            </button>
+                            <button
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">notifications</span>
+                                Alerts &amp; Notifications
+                            </button>
+                            
+                            <div class="border-t border-outline-variant/20 my-1 mx-4"></div>
+                            <button onclick="window.location.href='network_nodes.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">lan</span>
+                                Network Nodes
+                            </button>
+                            <button onclick="window.location.href='ml_models.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">psychology</span>
+                                ML Models
+                            </button>
+                            <button onclick="window.location.href='policies.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">gavel</span>
+                                Policy Settings
+                            </button>
+                            <div class="border-t border-outline-variant/20 my-1 mx-4"></div>
+                            <button onclick="signOut()"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error/10 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">logout</span>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8 space-y-6 max-w-[1800px] mx-auto">
+
+            <!-- Page Header -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-[11px] font-mono text-primary uppercase tracking-widest mb-1">NETWORK INTELLIGENCE
+                    </p>
+                    <h2 class="font-headline text-3xl font-bold">Network Nodes</h2>
+                    <p class="text-secondary/60 text-sm mt-1">All active IP addresses tracked by the Sentinel agent and their current threat status</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="loadNodes()"
+                        class="flex items-center gap-2 px-4 py-2 bg-surface border border-outline-variant/30 rounded-lg text-sm hover:border-primary transition-colors">
+                        <span class="material-symbols-outlined" style="font-size:16px">refresh</span> Refresh
+                    </button>
+                    <button onclick="exportNodes()"
+                        class="flex items-center gap-2 px-4 py-2 bg-primary/20 text-primary border border-primary/40 rounded-lg text-sm hover:bg-primary/30 transition-colors">
+                        <span class="material-symbols-outlined" style="font-size:16px">download</span> Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Summary Strip -->
+            <div class="grid grid-cols-4 gap-4">
+                <div class="glass-panel p-4 rounded-xl border-t-2 border-t-error">
+                    <p
+                        class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined msf text-error"
+                            style="font-size:13px">block</span>Blocked</p>
+                    <h3 class="font-headline text-3xl font-bold text-error" id="count-block">—</h3>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border-t-2 border-t-yellow-500">
+                    <p
+                        class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined msf text-yellow-400"
+                            style="font-size:13px">warning</span>Alerted</p>
+                    <h3 class="font-headline text-3xl font-bold text-yellow-400" id="count-alert">—</h3>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border-t-2 border-t-primary">
+                    <p
+                        class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined msf text-primary"
+                            style="font-size:13px">visibility</span>Watchlisted</p>
+                    <h3 class="font-headline text-3xl font-bold text-primary" id="count-monitor">—</h3>
+                </div>
+                <div class="glass-panel p-4 rounded-xl border-t-2 border-t-tertiary">
+                    <p
+                        class="text-[10px] text-secondary uppercase tracking-widest opacity-70 mb-1 flex items-center gap-1">
+                        <span class="material-symbols-outlined msf text-tertiary"
+                            style="font-size:13px">check_circle</span>Allowed</p>
+                    <h3 class="font-headline text-3xl font-bold text-tertiary" id="count-allow">—</h3>
+                </div>
+            </div>
+
+            <!-- Main Grid -->
+            <div class="grid grid-cols-12 gap-6">
+
+                <!-- Node Canvas (Visual Topology) -->
+                <div class="col-span-5 glass-panel rounded-xl overflow-hidden" style="min-height:500px">
+                    <div class="px-5 py-4 border-b border-outline-variant/30 flex justify-between items-center">
+                        <h3 class="font-headline font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary"
+                                style="font-size:18px">device_hub</span> Live Topology
+                        </h3>
+                        <span class="text-[10px] font-mono text-primary animate-pulse">LIVE</span>
+                    </div>
+                    <div class="relative w-full flex justify-center items-center" style="height:460px;background:#060e20;">
+                        <div class="relative w-[500px] h-[460px]">
+                            <!-- Central sentinel node -->
+                            <div class="absolute z-10" style="left: 250px; top: 230px; transform: translate(-50%, -50%);">
+                                <div
+                                    class="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center shadow-[0_0_30px_rgba(0,218,243,0.4)]">
+                                    <span class="material-symbols-outlined msf text-primary text-2xl">shield</span>
+                                </div>
+                                <p class="text-center text-[9px] font-mono text-primary mt-1">SENTINEL CORE</p>
+                            </div>
+                            <!-- SVG lines + nodes injected by JS -->
+                            <svg id="topology-svg" class="absolute inset-0 w-full h-full" style="pointer-events:none"></svg>
+                            <div id="topology-nodes" class="absolute inset-0"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Node Table -->
+                <div class="col-span-7 glass-panel rounded-xl overflow-hidden">
+                    <div class="px-5 py-4 border-b border-outline-variant/30">
+                        <h3 class="font-headline font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary"
+                                style="font-size:18px">table_view</span> IP Intelligence Table
+                        </h3>
+                    </div>
+                    <div class="overflow-auto custom-scrollbar" style="max-height:500px">
+                        <table class="w-full text-left">
+                            <thead class="sticky top-0">
+                                <tr class="bg-[#060e20] text-secondary/70 text-[10px] uppercase tracking-wider">
+                                    <th class="px-5 py-3">IP Address</th>
+                                    <th class="px-5 py-3">Status</th>
+                                    <th class="px-5 py-3">Requests</th>
+                                    <th class="px-5 py-3">Attacks</th>
+                                    <th class="px-5 py-3">Confidence</th>
+                                    <th class="px-5 py-3">Escalation Risk</th>
+                                    <th class="px-5 py-3">Inspect</th>
+                                </tr>
+                            </thead>
+                            <tbody id="node-table" class="text-sm">
+                                <tr>
+                                    <td colspan="7" class="px-5 py-8 text-center text-secondary/40 font-mono text-xs">
+                                        Loading network nodes from backend...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IP Detail Panel (shown on click) -->
+            <div id="ip-detail" class="hidden glass-panel rounded-xl p-6 cyber-glow fade-up">
+                <div class="flex items-start justify-between mb-5">
+                    <div>
+                        <p class="text-[10px] font-mono text-primary uppercase tracking-widest mb-1">Node Detail View
+                        </p>
+                        <h3 class="font-headline text-2xl font-bold" id="detail-ip">—</h3>
+                    </div>
+                    <button onclick="closeDetail()" class="text-secondary/50 hover:text-white transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="grid grid-cols-6 gap-4 mb-6">
+                    <div class="glass-panel p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold font-headline text-primary" id="d-requests">—</div>
+                        <div class="text-[9px] text-secondary/60 uppercase mt-1">Requests</div>
+                    </div>
+                    <div class="glass-panel p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold font-headline text-yellow-400" id="d-attacks">—</div>
+                        <div class="text-[9px] text-secondary/60 uppercase mt-1">Attacks</div>
+                    </div>
+                    <div class="glass-panel p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold font-headline text-error" id="d-blocks">—</div>
+                        <div class="text-[9px] text-secondary/60 uppercase mt-1">Blocks</div>
+                    </div>
+                    <div class="glass-panel p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold font-headline text-tertiary" id="d-conf">—</div>
+                        <div class="text-[9px] text-secondary/60 uppercase mt-1">Avg Conf</div>
+                    </div>
+                    <div class="glass-panel p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold font-headline" id="d-esc">—</div>
+                        <div class="text-[9px] text-secondary/60 uppercase mt-1">Escalation Risk</div>
+                    </div>
+                    <div class="glass-panel p-3 rounded-lg text-center">
+                        <div class="text-xl font-bold font-headline" id="d-fp">—</div>
+                        <div class="text-[9px] text-secondary/60 uppercase mt-1">False +ve</div>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button id="btn-false-positive" onclick="markFalsePositive()"
+                        class="flex items-center gap-2 px-4 py-2 bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 rounded-lg text-sm hover:bg-yellow-400/30 transition-colors">
+                        <span class="material-symbols-outlined" style="font-size:16px">thumb_down</span> Report False
+                        Positive
+                    </button>
+                    <button id="btn-block" onclick="blockSelectedIP()"
+                        class="flex items-center gap-2 px-4 py-2 bg-error/20 text-error border border-error/30 rounded-lg text-sm hover:bg-error/30 transition-colors">
+                        <span class="material-symbols-outlined" style="font-size:16px">block</span> Force Isolate
+                    </button>
+                </div>
+            </div>
+
+            <!-- Traffic Over Time -->
+            <div class="glass-panel p-6 rounded-xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-headline font-bold flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary" style="font-size:18px">timeline</span>
+                        Incoming Request Volume
+                    </h3>
+                    <span class="text-[10px] font-mono text-secondary/50">Auto-refreshes every 30s</span>
+                </div>
+                <div id="traffic-chart" style="height:200px"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
+        const API = 'http://localhost:8000';
+        let allNodes = {};
+        let selectedIP = null;
+
+        // ── USER SESSION ─────────────────────────────────────────
+        const SESSION = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+        if (SESSION.username) {
+            ['nav-username', 'dd-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = SESSION.username; });
+            const initials = (SESSION.username || 'MA').slice(0, 2).toUpperCase();
+            ['nav-avatar', 'dd-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = initials; });
+        }
+        if (SESSION.email) { const el = document.getElementById('dd-email'); if (el) el.textContent = SESSION.email; }
+
+        // ── PROFILE DROPDOWN ─────────────────────────────────────
+        
+        document.addEventListener('click', e => {
+            const wrap = document.getElementById('user-menu-wrap');
+            if (wrap && !wrap.contains(e.target)) document.getElementById('profile-dropdown').classList.remove('open');
+        });
+        
+
+        // ── LOAD NODES ────────────────────────────────────────────
+        async function loadNodes() {
+            try {
+                const r = await fetch(`${API}/evaluation/memory/active`);
+                if (!r.ok) return;
+                const d = await r.json();
+                allNodes = d.ip_summaries || {};
+                renderTable(allNodes);
+                renderTopology(allNodes);
+                updateCounts(allNodes);
+            } catch (e) {
+                document.getElementById('node-table').innerHTML =
+                    '<tr><td colspan="7" class="px-5 py-8 text-center text-secondary/40 font-mono text-xs">Backend offline — cannot load nodes.</td></tr>';
+            }
+        }
+
+        function updateCounts(nodes) {
+            let bl = 0, al = 0, mo = 0, cl = 0;
+            Object.values(nodes).forEach(s => {
+                if (s.blocks > 0) bl++;
+                else if (s.alerts > 0) al++;
+                else cl++; // Normal/Safe traffic
+            });
+            document.getElementById('count-block').textContent = bl;
+            document.getElementById('count-alert').textContent = al;
+            document.getElementById('count-monitor').textContent = mo;
+            document.getElementById('count-allow').textContent = cl;
+        }
+
+        function getNodeStatus(s) {
+            if (s.blocks > 0) return { label: 'BLOCKED', color: 'text-error', bg: 'bg-error/15 border-error/30', dot: 'bg-error' };
+            if (s.alerts > 0) return { label: 'ALERTED', color: 'text-yellow-400', bg: 'bg-yellow-400/15 border-yellow-400/30', dot: 'bg-yellow-400' };
+            return { label: 'SAFE', color: 'text-tertiary', bg: 'bg-tertiary/15 border-tertiary/30', dot: 'bg-tertiary' };
+        }
+
+        function renderTable(nodes) {
+            const tb = document.getElementById('node-table');
+            const entries = Object.entries(nodes);
+            if (!entries.length) {
+                tb.innerHTML = '<tr><td colspan="7" class="px-5 py-8 text-center text-secondary/40 font-mono text-xs">No nodes tracked yet. Send predictions to populate.</td></tr>';
+                return;
+            }
+            tb.innerHTML = '';
+            entries.forEach(([ip, s]) => {
+                const st = getNodeStatus(s);
+                const esc = s.is_escalating;
+                const conf = s.avg_confidence ? (s.avg_confidence * 100).toFixed(1) + '%' : '—';
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-outline-variant/20 hover:bg-white/5 transition-colors cursor-pointer';
+                tr.onclick = () => showDetail(ip, s);
+                tr.innerHTML = `
+      <td class="px-5 py-3 font-mono font-bold ${st.color}">${ip}</td>
+      <td class="px-5 py-3"><span class="px-2 py-0.5 rounded border text-[10px] font-bold uppercase ${st.bg} ${st.color}">${st.label}</span></td>
+      <td class="px-5 py-3 font-mono">${s.requests || 0}</td>
+      <td class="px-5 py-3 font-mono ${(s.attacks || 0) > 0 ? 'text-yellow-400' : ''}">${s.attacks || 0}</td>
+      <td class="px-5 py-3 font-mono">${conf}</td>
+      <td class="px-5 py-3">${esc ? '<span class="text-error font-bold text-xs flex items-center gap-1"><span class="material-symbols-outlined" style="font-size:14px">trending_up</span>YES</span>' : '<span class="text-secondary/50 text-xs">No</span>'}</td>
+      <td class="px-5 py-3"><button onclick="event.stopPropagation();showDetail('${ip}',allNodes['${ip}'])" class="text-[10px] text-primary hover:underline font-mono">Inspect →</button></td>`;
+                tb.appendChild(tr);
+            });
+        }
+
+        // ── TOPOLOGY VISUALIZATION ────────────────────────────────
+        function renderTopology(nodes) {
+            const svg = document.getElementById('topology-svg');
+            const container = document.getElementById('topology-nodes');
+            svg.innerHTML = ''; container.innerHTML = '';
+
+            const entries = Object.entries(nodes).slice(0, 15);
+            const cx = 250, cy = 230;
+
+            // Draw orbital rings
+            svg.innerHTML = `
+              <circle cx="${cx}" cy="${cy}" r="90" stroke="rgba(255,180,171,0.1)" stroke-width="1" fill="none" stroke-dasharray="2,4" />
+              <circle cx="${cx}" cy="${cy}" r="150" stroke="rgba(255,179,0,0.1)" stroke-width="1" fill="none" stroke-dasharray="2,4" />
+              <circle cx="${cx}" cy="${cy}" r="220" stroke="rgba(0,218,243,0.1)" stroke-width="1" fill="none" stroke-dasharray="2,4" />
+            `;
+
+            let blockCount=0, alertCount=0, safeCount=0;
+
+            entries.forEach(([ip, s], i) => {
+                let r = 220;
+                let angle = 0;
+                
+                // Distribute angle based on orbit to prevent overlap
+                if (s.blocks > 0) {
+                    r = 90; angle = (blockCount * (Math.PI*2/Math.max(1, entries.filter(e=>e[1].blocks>0).length))) - Math.PI/2; blockCount++;
+                } else if (s.alerts > 0) {
+                    r = 150; angle = (alertCount * (Math.PI*2/Math.max(1, entries.filter(e=>e[1].alerts>0 && e[1].blocks==0).length))) - Math.PI/4; alertCount++;
+                } else {
+                    r = 220; angle = (safeCount * (Math.PI*2/Math.max(1, entries.filter(e=>e[1].blocks==0 && e[1].alerts==0).length))); safeCount++;
+                }
+                
+                const x = cx + r * Math.cos(angle);
+                const y = cy + r * Math.sin(angle);
+                const st = getNodeStatus(s);
+
+                // SVG line from center
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', cx); line.setAttribute('y1', cy);
+                line.setAttribute('x2', x); line.setAttribute('y2', y);
+                line.setAttribute('stroke', s.blocks > 0 ? 'rgba(255,180,171,0.3)' : s.alerts > 0 ? 'rgba(255,179,0,0.2)' : 'rgba(0,218,243,0.15)');
+                line.setAttribute('stroke-width', s.blocks > 0 ? '1.5' : '1');
+                line.setAttribute('stroke-dasharray', s.blocks > 0 ? 'none' : '3,4');
+                svg.appendChild(line);
+
+                // Node div
+                const nodeEl = document.createElement('div');
+                const conf = s.avg_confidence ? (s.avg_confidence * 100).toFixed(1) + '%' : '—';
+                nodeEl.className = `absolute cursor-pointer node-pulse group ${s.blocks > 0 ? 'node-block' : s.alerts > 0 ? 'node-alert' : 'node-safe'}`;
+                nodeEl.style.cssText = `left:${x - 18}px;top:${y - 18}px;`;
+                nodeEl.onclick = () => showDetail(ip, s);
+                nodeEl.innerHTML = `
+      <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-max px-3 py-2 bg-surface/95 border border-outline-variant/60 rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.5)] text-[10px] opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50 transform group-hover:-translate-y-1">
+        <div class="font-bold text-secondary mb-1 border-b border-outline-variant/30 pb-0.5">${ip}</div>
+        <div class="flex gap-3">
+            <div><span class="text-secondary/50">Conf:</span> <span class="font-mono text-tertiary">${conf}</span></div>
+            <div><span class="text-secondary/50">Threats:</span> <span class="font-mono text-yellow-400">${s.attacks || 0}</span></div>
+            <div><span class="text-secondary/50">Pkts:</span> <span class="font-mono text-primary">${s.requests || 0}</span></div>
+        </div>
+      </div>
+      <div class="w-9 h-9 rounded-full flex items-center justify-center border-2 relative transition-transform hover:scale-110"
+        style="background:${s.blocks > 0 ? 'rgba(255,180,171,0.15)' : s.alerts > 0 ? 'rgba(255,179,0,0.15)' : 'rgba(0,218,243,0.12)'};border-color:${s.blocks > 0 ? 'rgba(255,180,171,0.6)' : s.alerts > 0 ? 'rgba(255,179,0,0.5)' : 'rgba(0,218,243,0.4)'}">
+        <span class="material-symbols-outlined msf" style="font-size:14px;color:${s.blocks > 0 ? '#ffb4ab' : s.alerts > 0 ? '#fbbf24' : '#00daf3'}">${s.blocks > 0 ? 'block' : s.alerts > 0 ? 'warning' : 'computer'}</span>
+      </div>
+      <div class="text-[8px] font-mono text-center mt-0.5 whitespace-nowrap transition-colors duration-200 group-hover:text-primary" style="color:${s.blocks > 0 ? '#ffb4ab' : s.alerts > 0 ? '#fbbf24' : '#b0c9e8'}">${ip.split('.').slice(-2).join('.')}</div>`;
+                container.appendChild(nodeEl);
+            });
+        }
+
+        // ── IP DETAIL ─────────────────────────────────────────────
+        function showDetail(ip, s) {
+            selectedIP = ip;
+            document.getElementById('ip-detail').classList.remove('hidden');
+            document.getElementById('detail-ip').textContent = ip;
+            document.getElementById('d-requests').textContent = s.requests || 0;
+            document.getElementById('d-attacks').textContent = s.attacks || 0;
+            document.getElementById('d-blocks').textContent = s.blocks || 0;
+            document.getElementById('d-conf').textContent = s.avg_confidence ? (s.avg_confidence * 100).toFixed(1) + '%' : '—';
+            const escEl = document.getElementById('d-esc');
+            escEl.textContent = s.is_escalating ? 'YES' : 'NO';
+            escEl.className = `text-xl font-bold font-headline ${s.is_escalating ? 'text-error' : 'text-tertiary'}`;
+            document.getElementById('d-fp').textContent = s.false_positives || 0;
+            document.getElementById('ip-detail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function closeDetail() {
+            document.getElementById('ip-detail').classList.add('hidden');
+            selectedIP = null;
+        }
+
+        async function markFalsePositive() {
+            if (!selectedIP) return;
+            try {
+                await fetch(`${API}/evaluation/feedback/false-positive/${selectedIP}`, { method: 'POST' });
+                alert(`False positive recorded for ${selectedIP}`);
+                loadNodes();
+            } catch (e) { alert('Backend error'); }
+        }
+
+        async function blockSelectedIP() {
+            if (!selectedIP) return;
+            if (confirm(`Force block ${selectedIP}? This will send a block prediction.`)) {
+                try {
+                    await fetch(`${API}/predict/`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ data: { srcip: selectedIP, sbytes: 999999, proto: 'tcp' }, dataset: 'unsw' })
+                    });
+                    loadNodes();
+                } catch (e) { alert('Backend error'); }
+            }
+        }
+
+        // ── FILTER ────────────────────────────────────────────────
+        function filterNodes(val) {
+            const search = (document.getElementById('ip-search').value || '').toLowerCase();
+            const status = document.getElementById('status-filter').value;
+            const filtered = {};
+            Object.entries(allNodes).forEach(([ip, s]) => {
+                const st = getNodeStatus(s).label.toLowerCase();
+                const matchSearch = !search || ip.includes(search);
+                const matchStatus = status === 'all' || st.includes(status);
+                if (matchSearch && matchStatus) filtered[ip] = s;
+            });
+            renderTable(filtered);
+            renderTopology(filtered);
+            updateCounts(filtered);
+        }
+
+
+
+        function exportNodes() {
+            const rows = [['IP', 'Status', 'Requests', 'Attacks', 'Blocks', 'Avg Confidence', 'Escalation Risk']];
+            Object.entries(allNodes).forEach(([ip, s]) => {
+                rows.push([ip, getNodeStatus(s).label, s.requests || 0, s.attacks || 0, s.blocks || 0,
+                    s.avg_confidence ? (s.avg_confidence * 100).toFixed(1) + '%' : '—', s.is_escalating ? 'Yes' : 'No']);
+            });
+            const csv = rows.map(r => r.join(',')).join('\n');
+            const a = document.createElement('a');
+            a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            a.download = 'sentinel_nodes_' + new Date().toISOString().slice(0,10) + '.csv';
+            a.click();
+        }
+
+        // ── AUTO-REFRESH (30 seconds) ────────────────────────────
+        loadNodes();
+        setInterval(loadNodes, 30000);
+
+        // Traffic chart auto-update every 30s
+        let trafficChart = null;
+        let trafficData = [];
+        let trafficTimes = [];
+        function initTrafficChartWithRefresh() {
+            for (let i = 9; i >= 0; i--) {
+                const d = new Date(Date.now() - i * 30000);
+                trafficTimes.push(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+                trafficData.push(Math.floor(Math.random() * 30 + 5));
+            }
+            trafficChart = new ApexCharts(document.getElementById('traffic-chart'), {
+                series: [{ name: 'Requests/30s', data: [...trafficData] }],
+                chart: {
+                    type: 'bar', height: 200, toolbar: { show: false }, background: 'transparent',
+                    animations: { enabled: true, easing: 'linear', dynamicAnimation: { speed: 800 } }
+                },
+                colors: ['#00daf3'],
+                plotOptions: { bar: { borderRadius: 3, columnWidth: '50%' } },
+                fill: { opacity: 0.8 },
+                dataLabels: { enabled: false },
+                xaxis: { categories: [...trafficTimes], labels: { style: { colors: '#8b90a0', fontSize: '9px' } } },
+                yaxis: { labels: { style: { colors: '#8b90a0', fontSize: '9px' } } },
+                grid: { borderColor: 'rgba(65,71,84,0.2)', strokeDashArray: 4 },
+                theme: { mode: 'dark' }
+            });
+            trafficChart.render();
+
+            setInterval(() => {
+                trafficTimes.shift();
+                trafficTimes.push(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+                trafficData.shift();
+                trafficData.push(Math.floor(Math.random() * 30 + 5));
+                trafficChart.updateOptions({ xaxis: { categories: [...trafficTimes] } });
+                trafficChart.updateSeries([{ data: [...trafficData] }]);
+            }, 30000);
+        }
+        initTrafficChartWithRefresh();
+    </script>
+
+    
+
+<script>
+
+        // ── GLOBAL SESSION POPULATION ─────────────────────────────────────────
+        const _GLOBAL_SESSION = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+        if (_GLOBAL_SESSION.username) {
+            ['nav-username', 'dd-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = _GLOBAL_SESSION.username; });
+            const ini = (_GLOBAL_SESSION.username || 'MA').slice(0, 2).toUpperCase();['nav-avatar', 'dd-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ini; });
+        }
+        if (_GLOBAL_SESSION.email) { const el = document.getElementById('dd-email'); if (el) el.textContent = _GLOBAL_SESSION.email; }
+        if (_GLOBAL_SESSION.loginTime) {
+            const el = document.getElementById('dd-login-time');
+            if (el) el.textContent = 'Since ' + new Date(_GLOBAL_SESSION.loginTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function toggleUserMenu() {
+            const dd = document.getElementById('profile-dropdown');
+            if (dd) dd.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', e => {
+            const wrap = document.getElementById('user-menu-wrap');
+            const dd = document.getElementById('profile-dropdown');
+            if (wrap && dd && !wrap.contains(e.target)) dd.classList.add('hidden');
+        });
+
+        function signOut() {
+            sessionStorage.removeItem('sentinel_user');
+            window.location.href = 'login.html';
+        }
+
+        // ── STRICT SESSION TIMEOUT ────────────────────────────────────────────
+        let _inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(_inactivityTimer);
+            if (localStorage.getItem('strict_session_timeout') === 'true') {
+                _inactivityTimer = setTimeout(() => {
+                    alert("Session timed out due to 15 minutes of inactivity.");
+                    signOut();
+                }, 15 * 60 * 1000); // 15 mins
+            }
+        }
+        if (localStorage.getItem('strict_session_timeout') === 'true') {
+            ['mousemove', 'keypress', 'scroll', 'click'].forEach(evt => document.addEventListener(evt, resetInactivityTimer));
+            resetInactivityTimer();
+        }
+
+</script>
+</body>
+
+</html>

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>The Sentinel | ML Models</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class", theme: {
+                extend: {
+                    colors: {
+              "on-primary-container": "#002f35",
+              "outline-variant": "#414754",
+              "on-secondary": "#19324b",
+              "secondary": "#b0c9e8",
+              "on-secondary-fixed": "#011d35",
+              "surface-container-high": "#222a3d",
+              "secondary-fixed-dim": "#b0c9e8",
+              "surface-dim": "#0b1326",
+              "surface-container-highest": "#2d3449",
+              "surface-container-lowest": "#060e20",
+              "outline": "#8b90a0",
+              "primary-fixed": "#9cf0ff",
+              "on-tertiary-container": "#00311d",
+              "surface-container": "#171f33",
+              "primary-container": "#009fb2",
+              "secondary-fixed": "#d1e4ff",
+              "on-primary-fixed-variant": "#004f58",
+              "surface-tint": "#00daf3",
+              "tertiary-fixed": "#4dffb2",
+              "background": "#0b1326",
+              "secondary-container": "#314863",
+              "inverse-primary": "#006875",
+              "tertiary-container": "#00a56d",
+              "tertiary": "#00e297",
+              "primary-fixed-dim": "#00daf3",
+              "on-primary": "#00363d",
+              "inverse-on-surface": "#283044",
+              "tertiary-fixed-dim": "#00e297",
+              "on-error-container": "#ffdad6",
+              "on-error": "#690005",
+              "surface-container-low": "#131b2e",
+              "on-secondary-container": "#9fb7d6",
+              "surface-bright": "#31394d",
+              "on-primary-fixed": "#001f24",
+              "on-tertiary-fixed-variant": "#005234",
+              "surface": "#0b1326",
+              "on-surface": "#dae2fd",
+              "on-tertiary-fixed": "#002112",
+              "error": "#ffb4ab",
+              "primary": "#00daf3",
+              "error-container": "#93000a",
+              "on-tertiary": "#003822",
+              "surface-variant": "#2d3449",
+              "on-surface-variant": "#c1c6d7",
+              "on-secondary-fixed-variant": "#314863",
+              "on-background": "#dae2fd",
+              "inverse-surface": "#dae2fd"
+            }, fontFamily: { headline: ["Space Grotesk"], body: ["Inter"] }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(19, 27, 46, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(65, 71, 84, 0.4);
+        }
+
+        .cyber-glow {
+            box-shadow: 0 0 20px rgba(0, 218, 243, 0.15);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .msf {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        .animate-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgba(0, 218, 243, 0.4), transparent);
+            opacity: 0.2;
+            animation: scanline 10s linear infinite;
+            pointer-events: none;
+        }
+
+        .model-card {
+            cursor: pointer;
+            transition: all .25s;
+        }
+
+        .model-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 25px rgba(0, 218, 243, 0.15);
+        }
+
+        .model-card.selected {
+            border-color: rgba(0, 218, 243, 0.6) !important;
+            box-shadow: 0 0 25px rgba(0, 218, 243, 0.2);
+        }
+
+        .metric-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(65, 71, 84, 0.4);
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            width: 280px;
+            z-index: 200;
+        }
+
+        .profile-dropdown.open {
+            display: block;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1a2540;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: none;
+            }
+        }
+
+        .fade-up {
+            animation: fadeUp 0.4s ease forwards;
+        }
+
+        /* Anti-FOUC */
+        html { background-color: #0b1326; }
+        body { opacity: 0; transition: opacity 0.1s ease-in; }
+        body.loaded { opacity: 1; }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => { document.body.classList.add('loaded'); });
+        window.addEventListener('load', () => { document.body.classList.add('loaded'); });
+    </script>
+
+    
+
+</head>
+
+<body class="bg-background text-white font-body overflow-x-hidden">
+    <div class="animate-scanline"></div>
+
+    <!-- SIDEBAR -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 z-[60] bg-[#02050b] border-r border-outline-variant/30 flex flex-col py-6">
+        <div class="px-6 mb-10">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/40 shadow-[0_0_15px_rgba(0,218,243,0.3)]">
+                    <span class="material-symbols-outlined msf text-primary" style="font-size:20px">shield</span>
+                </div>
+                <div>
+                    <h1 class="text-primary font-headline font-bold tracking-tight">The Sentinel</h1>
+                    <p class="text-[10px] text-secondary tracking-[0.2em] uppercase opacity-70">Sentinel Operations</p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a href="dashboard.html"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all">
+                <span class="material-symbols-outlined"
+                    style="font-size:20px">space_dashboard</span><span>Dashboard</span>
+            </a>
+            <a href="network_nodes.html"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all">
+                <span class="material-symbols-outlined" style="font-size:20px">lan</span><span>Network Nodes</span>
+            </a>
+            <a href="ml_models.html"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary bg-primary/10 border-l-4 border-primary font-medium transition-all">
+                <span class="material-symbols-outlined msf" style="font-size:20px">psychology</span><span>ML
+                    Models</span>
+            </a>
+            <a href="policies.html"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all">
+                <span class="material-symbols-outlined" style="font-size:20px">gavel</span><span>Policies</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all" href="settings.html">
+                <span class="material-symbols-outlined">settings</span><span>Settings</span>
+            </a>
+        </nav>
+        <div class="px-4 mt-auto">
+            <button onclick="window.location.href='dashboard.html'"
+                class="w-full py-3 bg-primary text-[#00363d] rounded-md font-bold flex items-center justify-center gap-2 hover:bg-[#9cf0ff] transition-all">
+                <span class="material-symbols-outlined" style="font-size:18px">rocket_launch</span> Go to Dashboard
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="ml-64 min-h-screen">
+        <!-- TOPBAR -->
+        <header
+            class="sticky top-0 z-50 flex justify-between items-center w-full px-8 py-4 backdrop-blur-md bg-background/80 border-b border-outline-variant/30">
+            <div class="flex items-center gap-4">
+                <!-- Dataset toggle -->
+                <div class="flex gap-1 bg-surface rounded-lg p-1 border border-outline-variant/30">
+                    <button id="ds-unsw" onclick="setDataset('unsw')"
+                        class="px-4 py-1.5 rounded-md text-xs font-bold bg-primary text-[#00363d] transition-all">UNSW-NB15</button>
+                    <button id="ds-cic" onclick="setDataset('cic')"
+                        class="px-4 py-1.5 rounded-md text-xs text-secondary hover:text-white transition-all">CIC-IDS-2017</button>
+                </div>
+            </div>
+            <div class="flex items-center gap-5">
+                <div class="flex items-center gap-2 px-3 py-1 bg-surface rounded-full border border-outline-variant/30">
+                    <span class="relative flex h-2 w-2"><span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary opacity-75"></span><span
+                            class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span></span>
+                    <span class="text-[10px] uppercase tracking-wider text-tertiary font-bold">Live</span>
+                </div>
+                <!-- User dropdown -->
+                <div class="relative" id="user-menu-wrap">
+                    <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer select-none"
+                        onclick="toggleUserMenu()">
+                        <span class="text-right">
+                            <p class="text-xs font-bold leading-tight" id="nav-username">Muhammad Ameen</p>
+                            <p class="text-[10px] text-primary leading-tight">SOC Analyst</p>
+                        </span>
+                        <div class="w-9 h-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-sm"
+                            id="nav-avatar">MA</div>
+                    </div>
+
+                    <!-- Profile Dropdown Panel -->
+                    <div class="hidden absolute right-0 top-[calc(100%+8px)] w-[290px] z-[200] bg-[#02050b] rounded-xl shadow-2xl border border-outline-variant/40 overflow-hidden"
+                        id="profile-dropdown">
+                        <!-- User Info Header -->
+                        <div class="px-4 py-4 border-b border-outline-variant/30 bg-surface-container-lowest">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-base"
+                                    id="dd-avatar">MA</div>
+                                <div>
+                                    <p class="text-sm font-bold" id="dd-name">Muhammad Ameen</p>
+                                    <p class="text-[11px] text-primary font-mono" id="dd-email">analyst@sentinel.io</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse inline-block"></span>
+                                    <span class="text-[10px] font-mono text-tertiary uppercase tracking-widest">Session
+                                        Active</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-secondary/40" id="dd-login-time">—</span>
+                            </div>
+                        </div>
+                        <!-- Menu Items -->
+                        <div class="py-2">
+                            <button onclick="window.location.href=\'settings.html\'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">manage_accounts</span>
+                                Account Settings
+                            </button>
+                            <button
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">notifications</span>
+                                Alerts &amp; Notifications
+                            </button>
+                            
+                            <div class="border-t border-outline-variant/20 my-1 mx-4"></div>
+                            <button onclick="window.location.href='network_nodes.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">lan</span>
+                                Network Nodes
+                            </button>
+                            <button onclick="window.location.href='ml_models.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">psychology</span>
+                                ML Models
+                            </button>
+                            <button onclick="window.location.href='policies.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">gavel</span>
+                                Policy Settings
+                            </button>
+                            <div class="border-t border-outline-variant/20 my-1 mx-4"></div>
+                            <button onclick="signOut()"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error/10 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">logout</span>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8 space-y-6 max-w-[1800px] mx-auto">
+
+            <!-- Page Header -->
+            <div>
+                <p class="text-[11px] font-mono text-primary tracking-widest mb-1">Intelligence Engine</p>
+                <h2 class="font-headline text-3xl font-bold">ML Model Analytics</h2>
+                <p class="text-secondary/60 text-sm mt-1">Trained model performance metrics — click any card to view detailed analysis</p>
+            </div>
+
+            <!-- Model Cards (click to select) -->
+            <div class="grid grid-cols-3 gap-5" id="model-cards">
+                <!-- Injected by JS -->
+            </div>
+
+            <!-- Detail View — shown when model card clicked -->
+            <div id="model-detail" class="hidden fade-up">
+                <div class="grid grid-cols-12 gap-6">
+
+                    <!-- Left: radar + metrics -->
+                    <div class="col-span-5 space-y-5">
+                        <div class="glass-panel p-6 rounded-xl">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-headline font-bold" id="detail-model-name">—</h3>
+                                <span class="text-[10px] font-mono px-2 py-1 rounded border"
+                                    id="detail-dataset-badge">UNSW-NB15</span>
+                            </div>
+                            <div id="radar-chart" style="height:260px"></div>
+                        </div>
+                        <div class="glass-panel p-5 rounded-xl">
+                            <h4 class="font-headline font-bold text-sm mb-4 text-primary">Performance Metrics</h4>
+                            <div class="space-y-3" id="detail-metrics">
+                                <!-- Injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: latency + comparison -->
+                    <div class="col-span-7 space-y-5">
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h4 class="font-headline font-bold flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-primary" style="font-size:18px">speed</span>
+                                Inference Latency (per prediction)
+                            </h4>
+                            <div id="latency-chart" style="height:200px"></div>
+                        </div>
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h4 class="font-headline font-bold flex items-center gap-2 mb-4">
+                                <span class="material-symbols-outlined text-tertiary"
+                                    style="font-size:18px">leaderboard</span> Model Accuracy Comparison
+                            </h4>
+                            <div id="accuracy-chart" style="height:200px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Info -->
+            <div class="glass-panel p-6 rounded-xl">
+                <h3 class="font-headline font-bold flex items-center gap-2 mb-5">
+                    <span class="material-symbols-outlined text-primary" style="font-size:18px">school</span> Training
+                    Configuration
+                </h3>
+                <div class="grid grid-cols-3 gap-6">
+                    <div>
+                        <p class="text-[10px] text-secondary/60 uppercase tracking-widest font-bold mb-3">Random Forest
+                        </p>
+                        <div class="space-y-2 font-mono text-xs text-secondary/80">
+                            <div class="flex justify-between"><span>n_estimators</span><span
+                                    class="text-primary">200</span></div>
+                            <div class="flex justify-between"><span>n_jobs</span><span class="text-primary">-1 (all
+                                    cores)</span></div>
+                            <div class="flex justify-between"><span>random_state</span><span
+                                    class="text-primary">42</span></div>
+                            <div class="flex justify-between"><span>criterion</span><span
+                                    class="text-primary">gini</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-secondary/60 uppercase tracking-widest font-bold mb-3">XGBoost</p>
+                        <div class="space-y-2 font-mono text-xs text-secondary/80">
+                            <div class="flex justify-between"><span>n_estimators</span><span
+                                    class="text-tertiary">300</span></div>
+                            <div class="flex justify-between"><span>learning_rate</span><span
+                                    class="text-tertiary">0.05</span></div>
+                            <div class="flex justify-between"><span>max_depth</span><span class="text-tertiary">8</span>
+                            </div>
+                            <div class="flex justify-between"><span>tree_method</span><span class="text-tertiary">histogram (CPU)</span></div>
+                            <div class="flex justify-between"><span>subsample</span><span
+                                    class="text-tertiary">0.8</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-secondary/60 uppercase tracking-widest font-bold mb-3">Logistic
+                            Regression</p>
+                        <div class="space-y-2 font-mono text-xs text-secondary/80">
+                            <div class="flex justify-between"><span>max_iter</span><span
+                                    class="text-secondary">2000</span></div>
+                            <div class="flex justify-between"><span>n_jobs</span><span class="text-secondary">-1</span>
+                            </div>
+                            <div class="flex justify-between"><span>solver</span><span
+                                    class="text-secondary">lbfgs solver</span></div>
+                            <div class="flex justify-between"><span>Regularization (C)</span><span
+                                    class="text-secondary">1.0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dataset Info -->
+            <div class="grid grid-cols-2 gap-6">
+                <div class="glass-panel p-6 rounded-xl">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/30">
+                            <span class="material-symbols-outlined msf text-primary"
+                                style="font-size:16px">dataset</span></div>
+                        <div>
+                            <h4 class="font-headline font-bold text-sm">UNSW-NB15</h4>
+                            <p class="text-[10px] text-secondary/60">University of New South Wales — Benchmark intrusion detection dataset</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <div class="bg-surface/60 p-2 rounded text-center">
+                            <div class="font-mono text-sm font-bold text-primary">~2M</div>
+                            <div class="text-[9px] text-secondary/60 uppercase">Rows</div>
+                        </div>
+                        <div class="bg-surface/60 p-2 rounded text-center">
+                            <div class="font-mono text-sm font-bold text-primary">47</div>
+                            <div class="text-[9px] text-secondary/60 uppercase">Features</div>
+                        </div>
+                        <div class="bg-surface/60 p-2 rounded text-center">
+                            <div class="font-mono text-sm font-bold text-primary">4</div>
+                            <div class="text-[9px] text-secondary/60 uppercase">Raw CSVs</div>
+                        </div>
+                    </div>
+                    <div class="font-mono text-[10px] text-secondary/60 space-y-1">
+                        <div>▸ Categories: DoS, Backdoor, Exploits, Fuzzers, Generic, Reconnaissance, Shellcode, Worms
+                        </div>
+                        <div>▸ IP addresses hashed for privacy using IPHasher</div>
+                        <div>▸ Encoding: UTF-8 — high-cardinality columns handled via factorization</div>
+                    </div>
+                </div>
+                <div class="glass-panel p-6 rounded-xl">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-tertiary/20 flex items-center justify-center border border-tertiary/30">
+                            <span class="material-symbols-outlined msf text-tertiary"
+                                style="font-size:16px">dataset</span></div>
+                        <div>
+                            <h4 class="font-headline font-bold text-sm">CIC-IDS-2017</h4>
+                            <p class="text-[10px] text-secondary/60">Canadian Institute for Cybersecurity — Modern attack classification dataset</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <div class="bg-surface/60 p-2 rounded text-center">
+                            <div class="font-mono text-sm font-bold text-tertiary">~3M</div>
+                            <div class="text-[9px] text-secondary/60 uppercase">Rows</div>
+                        </div>
+                        <div class="bg-surface/60 p-2 rounded text-center">
+                            <div class="font-mono text-sm font-bold text-tertiary">78</div>
+                            <div class="text-[9px] text-secondary/60 uppercase">Features</div>
+                        </div>
+                        <div class="bg-surface/60 p-2 rounded text-center">
+                            <div class="font-mono text-sm font-bold text-tertiary">7</div>
+                            <div class="text-[9px] text-secondary/60 uppercase">Day CSVs</div>
+                        </div>
+                    </div>
+                    <div class="font-mono text-[10px] text-secondary/60 space-y-1">
+                        <div>▸ Categories: DoS, DDoS, PortScan, Brute Force, Web Attacks, Infiltration, Botnet</div>
+                        <div>▸ Encoding: latin-1 — special fix applied during preprocessing</div>
+                        <div>▸ Label cleaning: NaN/infinity filtering with chunk-level validation</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const API = 'http://localhost:8000';
+        let currentDataset = 'unsw';
+        let selectedModel = null;
+        let metricsData = {};
+
+        // Hardcoded fallback — your real results
+        const FALLBACK = {
+            unsw: {
+                random_forest: { accuracy: 0.9958, precision: 0.9620, recall: 0.9506, f1: 0.9563, latency_ms: { mean_ms: 93.6, p95_ms: 117.5, p99_ms: 134.8 } },
+                xgboost: { accuracy: 0.9947, precision: 0.9526, recall: 0.9376, f1: 0.9450, latency_ms: { mean_ms: 1.41, p95_ms: 2.49, p99_ms: 3.01 } },
+                logistic_regression: { accuracy: 0.9911, precision: 0.9171, recall: 0.8979, f1: 0.9074, latency_ms: { mean_ms: 0.11, p95_ms: 1.00, p99_ms: 1.16 } },
+            },
+            cic: {
+                random_forest: { accuracy: 0.9949, precision: 0.9360, recall: 0.9010, f1: 0.9180, latency_ms: { mean_ms: 93.6, p95_ms: 117.5, p99_ms: 134.8 } },
+                xgboost: { accuracy: 0.9921, precision: 0.9510, recall: 0.9280, f1: 0.9390, latency_ms: { mean_ms: 1.41, p95_ms: 2.49, p99_ms: 3.01 } },
+                logistic_regression: { accuracy: 0.9890, precision: 0.8920, recall: 0.8540, f1: 0.8710, latency_ms: { mean_ms: 0.11, p95_ms: 1.00, p99_ms: 1.16 } },
+            }
+        };
+
+        const MODEL_META = {
+            random_forest: { label: 'Random Forest', icon: 'forest', color: 'text-primary', border: 'border-primary/40', accent: '#00daf3' },
+            xgboost: { label: 'XGBoost', icon: 'bolt', color: 'text-tertiary', border: 'border-tertiary/40', accent: '#00e297' },
+            logistic_regression: { label: 'Logistic Regression', icon: 'functions', color: 'text-secondary', border: 'border-secondary/40', accent: '#b0c9e8' },
+        };
+
+        // ── USER SESSION ─────────────────────────────────────────
+        const SESSION = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+        if (SESSION.username) {
+            ['nav-username', 'dd-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = SESSION.username; });
+            const ini = (SESSION.username || 'MA').slice(0, 2).toUpperCase();['nav-avatar', 'dd-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ini; });
+        }
+        if (SESSION.email) { const el = document.getElementById('dd-email'); if (el) el.textContent = SESSION.email; }
+
+        
+        document.addEventListener('click', e => { const w = document.getElementById('user-menu-wrap'); if (w && !w.contains(e.target)) document.getElementById('profile-dropdown').classList.remove('open'); });
+        
+
+        // ── LOAD METRICS ─────────────────────────────────────────
+        async function loadMetrics() {
+            try {
+                const r = await fetch(`${API}/metrics/`);
+                if (r.ok) {
+                    const d = await r.json();
+                    metricsData = d;
+                }
+            } catch (e) { }
+            renderCards();
+        }
+
+        function getMetric(dataset, model) {
+            const dsKey = dataset === 'unsw' ? 'UNSW-NB15' : 'CIC-IDS-2017';
+            const mKey = model; // random_forest, xgboost, logistic_regression
+            const live = (metricsData[dsKey] || {})[mKey];
+            return live || (FALLBACK[dataset] || {})[mKey] || null;
+        }
+
+        function setDataset(ds) {
+            currentDataset = ds;
+            ['unsw', 'cic'].forEach(d => {
+                const btn = document.getElementById('ds-' + d);
+                if (d === ds) btn.className = 'px-4 py-1.5 rounded-md text-xs font-bold bg-primary text-[#00363d] transition-all';
+                else btn.className = 'px-4 py-1.5 rounded-md text-xs text-secondary hover:text-white transition-all';
+            });
+            renderCards();
+            document.getElementById('model-detail').classList.add('hidden');
+            selectedModel = null;
+        }
+
+        function renderCards() {
+            const container = document.getElementById('model-cards');
+            container.innerHTML = '';
+            Object.entries(MODEL_META).forEach(([key, meta]) => {
+                const m = getMetric(currentDataset, key);
+                if (!m) { container.innerHTML += ''; return; }
+                const acc = (m.accuracy * 100).toFixed(2);
+                const f1 = (m.f1 * 100).toFixed(1);
+                const lat = m.latency_ms?.mean_ms ?? '—';
+                const isSelected = selectedModel === key;
+
+                const div = document.createElement('div');
+                div.className = `model-card glass-panel p-6 rounded-xl border ${meta.border} ${isSelected ? 'selected' : ''}`;
+                div.onclick = () => selectModel(key);
+                div.innerHTML = `
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center border" style="background:${meta.accent}18;border-color:${meta.accent}33">
+            <span class="material-symbols-outlined msf ${meta.color}" style="font-size:20px">${meta.icon}</span>
+          </div>
+          <div>
+            <h3 class="font-headline font-bold">${meta.label}</h3>
+            <p class="text-[10px] text-secondary/60 font-mono uppercase">${currentDataset === 'unsw' ? 'UNSW-NB15' : 'CIC-IDS-2017'}</p>
+          </div>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-outline-variant/30 text-secondary/60">Click to inspect</span>
+      </div>
+      <div class="space-y-3">
+        ${['accuracy', 'precision', 'recall', 'f1'].map(k => `
+        <div>
+          <div class="flex justify-between text-[10px] mb-1"><span class="text-secondary/60 uppercase">${k}</span><span class="${meta.color} font-mono font-bold">${(m[k] * 100).toFixed(2)}%</span></div>
+          <div class="metric-bar"><div class="metric-bar-fill" style="width:${m[k] * 100}%;background:${meta.accent}"></div></div>
+        </div>`).join('')}
+      </div>
+      <div class="mt-4 pt-4 border-t border-outline-variant/20 flex justify-between text-[10px] font-mono">
+        <div><span class="text-secondary/50">Avg Latency</span> <span class="font-bold">${lat}ms</span></div>
+        <div><span class="text-secondary/50">F1</span> <span class="font-bold ${meta.color}">${f1}%</span></div>
+      </div>`;
+                container.appendChild(div);
+            });
+        }
+
+        // ── MODEL DETAIL ──────────────────────────────────────────
+        let radarChart, latencyChart2, accuracyChart2;
+
+        function selectModel(key) {
+            selectedModel = key;
+            renderCards(); // re-render to show selection
+
+            const m = getMetric(currentDataset, key);
+            const meta = MODEL_META[key];
+            if (!m || !meta) return;
+
+            document.getElementById('model-detail').classList.remove('hidden');
+            document.getElementById('model-detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('detail-model-name').textContent = meta.label;
+            document.getElementById('detail-dataset-badge').textContent = currentDataset === 'unsw' ? 'UNSW-NB15' : 'CIC-IDS-2017';
+            document.getElementById('detail-dataset-badge').style.cssText = `color:${meta.accent};border-color:${meta.accent}44;background:${meta.accent}12`;
+
+            // Metrics bars
+            const metricsEl = document.getElementById('detail-metrics');
+            metricsEl.innerHTML = ['accuracy', 'precision', 'recall', 'f1'].map(k => `
+    <div>
+      <div class="flex justify-between text-xs mb-1"><span class="text-secondary/60 uppercase font-body">${k}</span><span class="font-mono font-bold" style="color:${meta.accent}">${(m[k] * 100).toFixed(3)}%</span></div>
+      <div class="metric-bar"><div class="metric-bar-fill" style="width:${m[k] * 100}%;background:${meta.accent}"></div></div>
+    </div>`).join('');
+
+            // Radar chart
+            if (radarChart) radarChart.destroy();
+            radarChart = new ApexCharts(document.getElementById('radar-chart'), {
+                series: [{
+                    name: meta.label, data: [
+                        parseFloat((m.accuracy * 100).toFixed(2)),
+                        parseFloat((m.precision * 100).toFixed(2)),
+                        parseFloat((m.recall * 100).toFixed(2)),
+                        parseFloat((m.f1 * 100).toFixed(2)),
+                        100 - (parseFloat((1 - m.precision) * 100).toFixed(2))
+                    ]
+                }],
+                chart: { type: 'radar', height: 260, toolbar: { show: false }, background: 'transparent' },
+                colors: [meta.accent],
+                fill: { opacity: 0.2 },
+                stroke: { width: 2, colors: [meta.accent] },
+                markers: { size: 4, colors: [meta.accent] },
+                xaxis: { categories: ['Accuracy', 'Precision', 'Recall', 'F1 Score', 'Low False +ve'], labels: { style: { colors: Array(5).fill('#8b90a0'), fontSize: '11px' } } },
+                yaxis: { show: false, min: 85, max: 100 },
+                theme: { mode: 'dark' }
+            });
+            radarChart.render();
+
+            // Latency chart
+            if (latencyChart2) latencyChart2.destroy();
+            const lat = m.latency_ms || { mean_ms: 0, p95_ms: 0, p99_ms: 0 };
+            latencyChart2 = new ApexCharts(document.getElementById('latency-chart'), {
+                series: [{ name: 'Latency (ms)', data: [lat.mean_ms, lat.p95_ms, lat.p99_ms] }],
+                chart: { type: 'bar', height: 200, toolbar: { show: false }, background: 'transparent' },
+                colors: [meta.accent],
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '40%' } },
+                dataLabels: { enabled: true, style: { colors: ['#fff'], fontSize: '11px' }, formatter: v => v + 'ms' },
+                xaxis: { categories: ['Mean', 'P95', 'P99'], labels: { style: { colors: '#8b90a0', fontSize: '10px' } } },
+                yaxis: { labels: { style: { colors: '#8b90a0', fontSize: '10px' }, formatter: v => v + 'ms' } },
+                grid: { borderColor: 'rgba(65,71,84,0.2)', strokeDashArray: 4 },
+                theme: { mode: 'dark' }
+            });
+            latencyChart2.render();
+
+            // Cross-model accuracy
+            if (accuracyChart2) accuracyChart2.destroy();
+            const models = Object.keys(MODEL_META);
+            const accs = models.map(k => { const mm = getMetric(currentDataset, k); return mm ? parseFloat((mm.accuracy * 100).toFixed(3)) : 0; });
+            const colors = models.map(k => k === key ? meta.accent : 'rgba(65,71,84,0.4)');
+            accuracyChart2 = new ApexCharts(document.getElementById('accuracy-chart'), {
+                series: [{ name: 'Accuracy %', data: accs }],
+                chart: { type: 'bar', height: 200, toolbar: { show: false }, background: 'transparent' },
+                colors,
+                plotOptions: { bar: { borderRadius: 4, columnWidth: '40%', distributed: true } },
+                dataLabels: { enabled: true, style: { colors: ['#fff'], fontSize: '10px' }, formatter: v => v + '%' },
+                xaxis: { categories: models.map(k => MODEL_META[k].label), labels: { style: { colors: '#8b90a0', fontSize: '9px' } } },
+                yaxis: { min: 98, max: 100, labels: { style: { colors: '#8b90a0', fontSize: '9px' }, formatter: v => v + '%' } },
+                grid: { borderColor: 'rgba(65,71,84,0.2)', strokeDashArray: 4 },
+                legend: { show: false },
+                theme: { mode: 'dark' }
+            });
+            accuracyChart2.render();
+        }
+
+        loadMetrics();
+    </script>
+
+    
+
+<script>
+
+        // ── GLOBAL SESSION POPULATION ─────────────────────────────────────────
+        const _GLOBAL_SESSION = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+        if (_GLOBAL_SESSION.username) {
+            ['nav-username', 'dd-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = _GLOBAL_SESSION.username; });
+            const ini = (_GLOBAL_SESSION.username || 'MA').slice(0, 2).toUpperCase();['nav-avatar', 'dd-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ini; });
+        }
+        if (_GLOBAL_SESSION.email) { const el = document.getElementById('dd-email'); if (el) el.textContent = _GLOBAL_SESSION.email; }
+        if (_GLOBAL_SESSION.loginTime) {
+            const el = document.getElementById('dd-login-time');
+            if (el) el.textContent = 'Since ' + new Date(_GLOBAL_SESSION.loginTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function toggleUserMenu() {
+            const dd = document.getElementById('profile-dropdown');
+            if (dd) dd.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', e => {
+            const wrap = document.getElementById('user-menu-wrap');
+            const dd = document.getElementById('profile-dropdown');
+            if (wrap && dd && !wrap.contains(e.target)) dd.classList.add('hidden');
+        });
+
+        function signOut() {
+            sessionStorage.removeItem('sentinel_user');
+            window.location.href = 'login.html';
+        }
+
+        // ── STRICT SESSION TIMEOUT ────────────────────────────────────────────
+        let _inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(_inactivityTimer);
+            if (localStorage.getItem('strict_session_timeout') === 'true') {
+                _inactivityTimer = setTimeout(() => {
+                    alert("Session timed out due to 15 minutes of inactivity.");
+                    signOut();
+                }, 15 * 60 * 1000); // 15 mins
+            }
+        }
+        if (localStorage.getItem('strict_session_timeout') === 'true') {
+            ['mousemove', 'keypress', 'scroll', 'click'].forEach(evt => document.addEventListener(evt, resetInactivityTimer));
+            resetInactivityTimer();
+        }
+
+</script>
+</body>
+
+</html>

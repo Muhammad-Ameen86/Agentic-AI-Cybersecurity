@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>The Sentinel | Secure Access Gateway</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class", theme: {
+        extend: {
+          colors: {
+              "on-primary-container": "#002f35",
+              "outline-variant": "#414754",
+              "on-secondary": "#19324b",
+              "secondary": "#b0c9e8",
+              "on-secondary-fixed": "#011d35",
+              "surface-container-high": "#222a3d",
+              "secondary-fixed-dim": "#b0c9e8",
+              "surface-dim": "#0b1326",
+              "surface-container-highest": "#2d3449",
+              "surface-container-lowest": "#060e20",
+              "outline": "#8b90a0",
+              "primary-fixed": "#9cf0ff",
+              "on-tertiary-container": "#00311d",
+              "surface-container": "#171f33",
+              "primary-container": "#009fb2",
+              "secondary-fixed": "#d1e4ff",
+              "on-primary-fixed-variant": "#004f58",
+              "surface-tint": "#00daf3",
+              "tertiary-fixed": "#4dffb2",
+              "background": "#0b1326",
+              "secondary-container": "#314863",
+              "inverse-primary": "#006875",
+              "tertiary-container": "#00a56d",
+              "tertiary": "#00e297",
+              "primary-fixed-dim": "#00daf3",
+              "on-primary": "#00363d",
+              "inverse-on-surface": "#283044",
+              "tertiary-fixed-dim": "#00e297",
+              "on-error-container": "#ffdad6",
+              "on-error": "#690005",
+              "surface-container-low": "#131b2e",
+              "on-secondary-container": "#9fb7d6",
+              "surface-bright": "#31394d",
+              "on-primary-fixed": "#001f24",
+              "on-tertiary-fixed-variant": "#005234",
+              "surface": "#0b1326",
+              "on-surface": "#dae2fd",
+              "on-tertiary-fixed": "#002112",
+              "error": "#ffb4ab",
+              "primary": "#00daf3",
+              "error-container": "#93000a",
+              "on-tertiary": "#003822",
+              "surface-variant": "#2d3449",
+              "on-surface-variant": "#c1c6d7",
+              "on-secondary-fixed-variant": "#314863",
+              "on-background": "#dae2fd",
+              "inverse-surface": "#dae2fd"
+            }, fontFamily: { headline: ["Space Grotesk"], body: ["Inter"] }
+        }
+      }
+    }
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .msf {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    .glass-panel {
+      background: rgba(45, 52, 73, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(139, 144, 160, 0.15);
+    }
+
+    .auth-grid {
+      background-image: radial-gradient(circle at 2px 2px, rgba(0, 218, 243, 0.05) 1px, transparent 0);
+      background-size: 40px 40px;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-6px);
+      }
+
+      75% {
+        transform: translateX(6px);
+      }
+    }
+
+    .animate-error {
+      animation: shake 0.3s cubic-bezier(.36, .07, .19, .97) both;
+    }
+
+    .field-error input,
+    .field-error select {
+      box-shadow: inset 0 0 0 1px #ffb4ab, 0 0 12px rgba(255, 180, 171, 0.3) !important;
+      color: #ffb4ab;
+    }
+
+    .field-error span.material-symbols-outlined {
+      color: #ffb4ab !important;
+    }
+  </style>
+
+    
+
+</head>
+
+<body class="bg-surface font-body text-on-surface min-h-screen flex flex-col auth-grid">
+
+  <header class="w-full flex justify-between items-center px-6 py-5 absolute top-0 z-50">
+    <div class="flex items-center gap-4">
+      <a href="screen.html" class="w-10 h-10 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-secondary hover:text-white hover:bg-surface-bright hover:border-primary transition-all group shadow-lg" title="Back to Landing">
+        <span class="material-symbols-outlined text-[20px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+      </a>
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined msf text-primary">shield</span>
+      <span class="text-primary font-headline text-xl font-bold uppercase tracking-widest select-none">The
+        Sentinel</span>
+    </div>
+    <div class="flex gap-4 items-center">
+      <span class="text-[10px] font-mono text-secondary/50 uppercase tracking-widest" id="backend-indicator">Checking
+        backend...</span>
+      <span
+        class="material-symbols-outlined text-secondary/70 hover:text-primary cursor-pointer transition-colors">help_outline</span>
+    </div>
+  </header>
+
+  <main class="flex-grow flex items-center justify-center px-4 py-20 relative overflow-hidden">
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none">
+    </div>
+
+    <div class="w-full max-w-md glass-panel rounded-xl p-8 shadow-2xl relative z-10">
+      <div class="text-center mb-8">
+        <div
+          class="w-14 h-14 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(0,218,243,0.2)]">
+          <span class="material-symbols-outlined msf text-primary text-3xl">shield</span>
+        </div>
+        <h1 class="font-headline text-2xl font-bold tracking-tight mb-4">Sign In</h1>
+        <div
+          class="flex p-1 bg-surface-container-lowest rounded-full max-w-[240px] mx-auto border border-outline-variant/10">
+          <a href="login.html"
+            class="flex-1 text-center py-1.5 px-4 rounded-full text-xs font-medium bg-primary text-on-primary transition-all">Login</a>
+          <a href="signup.html"
+            class="flex-1 text-center py-1.5 px-4 rounded-full text-xs font-medium text-on-surface-variant hover:text-on-surface transition-all">Sign
+            Up</a>
+        </div>
+      </div>
+
+      <!-- ERROR BANNER -->
+      <div id="error-banner"
+        class="hidden mb-4 p-3 rounded bg-error-container/20 border border-error/20 flex items-center gap-2">
+        <span class="material-symbols-outlined text-error text-[18px]">error</span>
+        <p class="text-[0.6875rem] text-error uppercase font-bold tracking-tight" id="error-msg">Invalid credentials</p>
+      </div>
+
+      <form id="login-form" class="space-y-5" onsubmit="return false;">
+        <!-- EMAIL -->
+        <div class="space-y-1.5">
+          <label
+            class="block text-[0.6875rem] font-medium uppercase tracking-widest text-on-surface-variant/80 ml-1">Email Address</label>
+          <div class="relative group" id="field-email">
+            <span
+              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px] group-focus-within:text-primary transition-colors">alternate_email</span>
+            <input id="login-email"
+              class="w-full bg-surface-container-low border-none rounded-lg py-3 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary/50 placeholder:text-outline/40 transition-all"
+              placeholder="analyst@sentinel.io" type="email" autocomplete="email" required />
+          </div>
+          <p class="hidden text-[10px] text-error ml-1" id="email-hint">Please enter a valid email address.</p>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center ml-1">
+            <label
+              class="block text-[0.6875rem] font-medium uppercase tracking-widest text-on-surface-variant/80">Password</label>
+            <a class="text-[0.6875rem] text-primary hover:underline uppercase tracking-tighter" href="#">Forgot
+              password?</a>
+          </div>
+          <div class="relative group" id="field-password">
+            <span
+              class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[20px] group-focus-within:text-primary transition-colors">lock</span>
+            <input id="login-password"
+              class="w-full bg-surface-container-low border-none rounded-lg py-3 pl-10 pr-12 text-sm focus:ring-1 focus:ring-primary/50 placeholder:text-outline/40 transition-all"
+              placeholder="Minimum 6 characters" type="password" autocomplete="current-password" required
+              minlength="6" />
+            <button id="toggle-pwd"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors"
+              type="button">
+              <span id="toggle-icon" class="material-symbols-outlined text-[20px]">visibility</span>
+            </button>
+          </div>
+          <p class="hidden text-[10px] text-error ml-1" id="pw-hint">Password must be at least 6 characters.</p>
+        </div>
+
+        <!-- REMEMBER -->
+        <div class="flex items-center gap-2 px-1">
+          <input
+            class="w-4 h-4 rounded border-outline-variant/30 bg-surface-container-low text-primary focus:ring-primary"
+            id="remember" type="checkbox" />
+            <label class="text-xs text-on-surface-variant cursor-pointer select-none" for="remember">Keep me signed in</label>
+        </div>
+
+        <!-- SUBMIT -->
+        <button id="btn-submit" onclick="handleLogin()" type="button"
+          class="w-full bg-primary text-on-primary font-headline font-bold py-3.5 rounded-lg active:scale-95 transition-all flex items-center justify-center gap-2 group">
+          <span id="submit-label">Sign In</span>
+          <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform"
+            id="submit-icon">arrow_forward</span>
+        </button>
+      </form>
+
+      <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-outline-variant/10"></div>
+        </div>
+        <div class="relative flex justify-center text-[0.625rem] uppercase tracking-[0.2em] font-bold">
+          <span class="px-3 bg-[#1d263a] text-outline">Or continue with</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3">
+        <a href="https://accounts.google.com/" target="_blank" rel="noopener"
+          class="flex items-center justify-center p-3 rounded-lg bg-surface-container-high hover:bg-surface-bright transition-colors border border-outline-variant/10 group"
+          title="Google">
+          <svg viewBox="0 0 24 24"
+            class="w-5 h-5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+            <path
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              fill="#4285F4" />
+            <path
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              fill="#34A853" />
+            <path
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              fill="#FBBC05" />
+            <path
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              fill="#EA4335" />
+          </svg>
+        </a>
+        <a href="https://github.com/login" target="_blank" rel="noopener"
+          class="flex items-center justify-center p-3 rounded-lg bg-surface-container-high hover:bg-surface-bright transition-colors border border-outline-variant/10 group"
+          title="GitHub">
+          <svg class="w-5 h-5 fill-on-surface opacity-60 group-hover:fill-white group-hover:opacity-100 transition-all"
+            viewBox="0 0 24 24">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+        </a>
+        <a href="https://login.microsoftonline.com/" target="_blank" rel="noopener"
+          class="flex items-center justify-center p-3 rounded-lg bg-surface-container-high hover:bg-surface-bright transition-colors border border-outline-variant/10 group"
+          title="Microsoft">
+          <svg viewBox="0 0 23 23"
+            class="w-5 h-5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+            <path d="M0 0h11v11H0z" fill="#f25022" />
+            <path d="M12 0h11v11H12z" fill="#7fba00" />
+            <path d="M0 12h11v11H0z" fill="#00a4ef" />
+            <path d="M12 12h11v11H12z" fill="#ffb900" />
+          </svg>
+        </a>
+        <a href="https://okta.com/login" target="_blank" rel="noopener"
+          class="flex items-center justify-center p-3 rounded-lg bg-surface-container-high hover:bg-surface-bright transition-colors border border-outline-variant/10 group"
+          title="Okta">
+          <svg viewBox="0 0 1024 1024"
+            class="w-5 h-5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+            <path
+              d="M512 0C229.2 0 0 229.2 0 512s229.2 512 512 512 512-229.2 512-512S794.8 0 512 0zm0 768c-141.4 0-256-114.6-256-256s114.6-256 256-256 256 114.6 256 256-114.6 256-256 256z"
+              fill="#007DC1" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer
+    class="w-full flex flex-col md:flex-row justify-between items-center px-10 py-5 bg-background border-t border-outline-variant/10 z-50">
+    <p class="text-[0.6875rem] font-medium uppercase tracking-tighter text-secondary opacity-50">© 2025 Muhammad Ameen —
+      The Sentinel, Final Year Project</p>
+    <div class="flex gap-6 mt-3 md:mt-0">
+      <a class="text-[0.6875rem] text-secondary hover:text-tertiary transition-colors uppercase tracking-tighter"
+        href="#">Privacy Policy</a>
+      <a class="text-[0.6875rem] text-secondary hover:text-tertiary transition-colors uppercase tracking-tighter"
+        href="#">Terms of Service</a>
+      <a class="text-[0.6875rem] text-secondary hover:text-tertiary transition-colors uppercase tracking-tighter"
+        href="#">Security Audit</a>
+    </div>
+  </footer>
+
+  <script>
+    const API = 'http://localhost:8000';
+
+    // ── PASSWORD TOGGLE ─────────────────────────────────────
+    document.getElementById('toggle-pwd').addEventListener('click', () => {
+      const pw = document.getElementById('login-password');
+      const icon = document.getElementById('toggle-icon');
+      if (pw.type === 'password') { pw.type = 'text'; icon.textContent = 'visibility_off'; }
+      else { pw.type = 'password'; icon.textContent = 'visibility'; }
+    });
+
+    // ── BACKEND STATUS ───────────────────────────────────────
+    async function checkBackend() {
+      const ind = document.getElementById('backend-indicator');
+      try {
+        const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(3000) });
+        if (r.ok) { ind.textContent = '● Backend Online'; ind.className = 'text-[10px] font-mono text-tertiary uppercase tracking-widest'; }
+        else throw new Error();
+      } catch {
+        ind.textContent = '○ Backend Offline';
+        ind.className = 'text-[10px] font-mono text-error/70 uppercase tracking-widest';
+      }
+    }
+    checkBackend();
+
+    // ── VALIDATION ───────────────────────────────────────────
+    function showFieldError(fieldId, hintId, msg) {
+      const field = document.getElementById(fieldId);
+      const hint = document.getElementById(hintId);
+      field.classList.add('field-error', 'animate-error');
+      if (hint) { hint.textContent = msg; hint.classList.remove('hidden'); }
+      setTimeout(() => field.classList.remove('animate-error', 'field-error'), 1000);
+    }
+
+    function clearFieldError(fieldId, hintId) {
+      document.getElementById(fieldId)?.classList.remove('field-error');
+      document.getElementById(hintId)?.classList.add('hidden');
+    }
+
+    function showError(msg) {
+      const b = document.getElementById('error-banner');
+      document.getElementById('error-msg').textContent = msg;
+      b.classList.remove('hidden');
+    }
+
+    function setLoading(loading) {
+      const btn = document.getElementById('btn-submit');
+      const label = document.getElementById('submit-label');
+      const icon = document.getElementById('submit-icon');
+      if (loading) {
+        btn.disabled = true;
+        label.textContent = 'Verifying credentials...';
+        icon.textContent = 'autorenew';
+        icon.classList.add('animate-spin');
+      } else {
+        btn.disabled = false;
+        label.textContent = 'Sign In';
+        icon.textContent = 'arrow_forward';
+        icon.classList.remove('animate-spin');
+      }
+    }
+
+    // ── LOGIN HANDLER ────────────────────────────────────────
+    async function handleLogin() {
+      const emailEl = document.getElementById('login-email');
+      const pwEl = document.getElementById('login-password');
+      let valid = true;
+
+      clearFieldError('field-email', 'email-hint');
+      clearFieldError('field-password', 'pw-hint');
+      document.getElementById('error-banner').classList.add('hidden');
+
+      // Email validation
+      const email = emailEl.value.trim();
+      if (!email) {
+        showFieldError('field-email', 'email-hint', 'Email address is required.');
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showFieldError('field-email', 'email-hint', 'Please enter a valid email address (e.g. user@domain.com).');
+        valid = false;
+      }
+
+      // Password validation
+      const pw = pwEl.value;
+      if (!pw) {
+        showFieldError('field-password', 'pw-hint', 'Password is required.');
+        valid = false;
+      } else if (pw.length < 6) {
+        showFieldError('field-password', 'pw-hint', 'Password must be at least 6 characters.');
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      setLoading(true);
+
+      try {
+        // POST login to backend — stores session in MongoDB
+        const r = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: pw })
+        });
+
+        if (r.ok) {
+          const d = await r.json();
+          // Store session for dashboard
+          sessionStorage.setItem('sentinel_user', JSON.stringify({
+            email: d.email || email,
+            username: d.username || email.split('@')[0],
+            token: d.token || '',
+            loginTime: new Date().toISOString()
+          }));
+          window.location.href = 'dashboard.html';
+          return;
+        }
+
+        if (r.status === 401) {
+          showError('Invalid credentials — check your email and password.');
+        } else if (r.status === 404) {
+          showError('Account not found. Please sign up first.');
+        } else {
+          throw new Error('Server error ' + r.status);
+        }
+
+      } catch (e) {
+        // Backend offline — check if this is demo mode
+        try {
+          const health = await fetch(`${API}/health`, { signal: AbortSignal.timeout(2000) });
+          if (!health.ok) throw new Error();
+        } catch {
+          // Backend is offline — proceed in demo mode
+          sessionStorage.setItem('sentinel_user', JSON.stringify({
+            email,
+            username: email.split('@')[0],
+            token: 'demo',
+            loginTime: new Date().toISOString()
+          }));
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        showError('Authentication service unavailable. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Allow Enter key submission
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+  </script>
+
+    
+
+</body>
+
+</html>

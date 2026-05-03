@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1.0" name="viewport" />
+    <title>The Sentinel | Complete Log Archives</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class", theme: {
+                extend: {
+                    colors: {
+              "on-primary-container": "#002f35",
+              "outline-variant": "#414754",
+              "on-secondary": "#19324b",
+              "secondary": "#b0c9e8",
+              "on-secondary-fixed": "#011d35",
+              "surface-container-high": "#222a3d",
+              "secondary-fixed-dim": "#b0c9e8",
+              "surface-dim": "#0b1326",
+              "surface-container-highest": "#2d3449",
+              "surface-container-lowest": "#060e20",
+              "outline": "#8b90a0",
+              "primary-fixed": "#9cf0ff",
+              "on-tertiary-container": "#00311d",
+              "surface-container": "#171f33",
+              "primary-container": "#009fb2",
+              "secondary-fixed": "#d1e4ff",
+              "on-primary-fixed-variant": "#004f58",
+              "surface-tint": "#00daf3",
+              "tertiary-fixed": "#4dffb2",
+              "background": "#0b1326",
+              "secondary-container": "#314863",
+              "inverse-primary": "#006875",
+              "tertiary-container": "#00a56d",
+              "tertiary": "#00e297",
+              "primary-fixed-dim": "#00daf3",
+              "on-primary": "#00363d",
+              "inverse-on-surface": "#283044",
+              "tertiary-fixed-dim": "#00e297",
+              "on-error-container": "#ffdad6",
+              "on-error": "#690005",
+              "surface-container-low": "#131b2e",
+              "on-secondary-container": "#9fb7d6",
+              "surface-bright": "#31394d",
+              "on-primary-fixed": "#001f24",
+              "on-tertiary-fixed-variant": "#005234",
+              "surface": "#0b1326",
+              "on-surface": "#dae2fd",
+              "on-tertiary-fixed": "#002112",
+              "error": "#ffb4ab",
+              "primary": "#00daf3",
+              "error-container": "#93000a",
+              "on-tertiary": "#003822",
+              "surface-variant": "#2d3449",
+              "on-surface-variant": "#c1c6d7",
+              "on-secondary-fixed-variant": "#314863",
+              "on-background": "#dae2fd",
+              "inverse-surface": "#dae2fd"
+            }, fontFamily: { headline: ["Space Grotesk"], body: ["Inter"] }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0b1326;
+            color: #e8edf5;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: rgba(19, 27, 46, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(65, 71, 84, 0.4);
+        }
+
+        .msf {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 218, 243, 0.2);
+            border-radius: 2px;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            background: rgba(11, 19, 38, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(65, 71, 84, 0.35);
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #b0c9e8;
+            font-size: .78rem;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 5px 12px;
+            border: 1px solid rgba(65, 71, 84, 0.5);
+            border-radius: 6px;
+            background: rgba(19, 27, 46, 0.5);
+            transition: all .2s;
+        }
+
+        .back-link:hover {
+            color: #00daf3;
+            border-color: rgba(0, 218, 243, 0.4);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: .82rem;
+            letter-spacing: .12em;
+        }
+
+        /* STAT STRIP */
+        .stat-strip {
+            display: flex;
+            gap: 0;
+            border: 1px solid rgba(65, 71, 84, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .stat-item {
+            padding: .6rem 1.5rem;
+            text-align: center;
+            border-right: 1px solid rgba(65, 71, 84, 0.35);
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-val {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-lbl {
+            font-size: .58rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #7a8ba8;
+            margin-top: 3px;
+        }
+
+        /* FILTERS */
+        .filter-input {
+            background: rgba(19, 27, 46, 0.8);
+            border: 1px solid rgba(65, 71, 84, 0.5);
+            border-radius: 8px;
+            padding: .6rem 1rem .6rem 2.4rem;
+            font-size: .82rem;
+            color: #e8edf5;
+            outline: none;
+            width: 100%;
+            transition: border-color .2s;
+        }
+
+        .filter-input:focus {
+            border-color: #00daf3;
+        }
+
+        .filter-input::placeholder {
+            color: #414754;
+        }
+
+        .filter-sel {
+            background: rgba(19, 27, 46, 0.8);
+            border: 1px solid rgba(65, 71, 84, 0.5);
+            border-radius: 8px;
+            padding: .6rem .85rem;
+            font-size: .8rem;
+            color: #b0c9e8;
+            outline: none;
+            cursor: pointer;
+            transition: border-color .2s;
+            min-width: 150px;
+        }
+
+        .filter-sel:focus {
+            border-color: #00daf3;
+        }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        thead tr {
+            background: #060e20;
+        }
+
+        th {
+            padding: .65rem 1rem;
+            text-align: left;
+            font-size: .6rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: #7a8ba8;
+            font-weight: 700;
+            white-space: nowrap;
+            border-bottom: 1px solid rgba(65, 71, 84, 0.4);
+        }
+
+        td {
+            padding: .8rem 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(65, 71, 84, 0.12);
+        }
+
+        tbody tr {
+            cursor: pointer;
+            transition: background .12s;
+        }
+
+        tbody tr:hover:not(.drawer-tr) {
+            background: rgba(0, 218, 243, 0.03);
+        }
+
+        tbody tr.expanded {
+            background: rgba(0, 218, 243, 0.05);
+        }
+
+        /* Column widths */
+        .col-expand {
+            width: 36px;
+        }
+
+        .col-time {
+            width: 13%;
+        }
+
+        .col-ip {
+            width: 11%;
+        }
+
+        .col-cat {
+            width: 9%;
+        }
+
+        .col-pred {
+            width: 7%;
+        }
+
+        .col-sev {
+            width: 7%;
+        }
+
+        .col-conf {
+            width: 8%;
+        }
+
+        .col-dec {
+            width: 7%;
+        }
+
+        .col-model {
+            width: 12%;
+        }
+
+        .col-esc {
+            width: 7%;
+        }
+
+        .col-req {
+            width: 5%;
+        }
+
+        .col-atk {
+            width: 5%;
+        }
+
+        .col-status {
+            width: 8%;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 3px;
+            font-size: .62rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            font-family: monospace;
+            white-space: nowrap;
+        }
+
+        .b-block {
+            background: rgba(255, 68, 68, .14);
+            color: #ff4444;
+            border: 1px solid rgba(255, 68, 68, .22);
+        }
+
+        .b-alert {
+            background: rgba(255, 179, 0, .14);
+            color: #ffb300;
+            border: 1px solid rgba(255, 179, 0, .22);
+        }
+
+        .b-monitor {
+            background: rgba(0, 218, 243, .12);
+            color: #00daf3;
+            border: 1px solid rgba(0, 218, 243, .2);
+        }
+
+        .b-allow {
+            background: rgba(0, 226, 151, .1);
+            color: #00e297;
+            border: 1px solid rgba(0, 226, 151, .18);
+        }
+
+        .b-crit {
+            background: rgba(255, 68, 68, .14);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 68, 68, .2);
+        }
+
+        .b-warn {
+            background: rgba(255, 179, 0, .12);
+            color: #ffb300;
+            border: 1px solid rgba(255, 179, 0, .2);
+        }
+
+        .b-low {
+            background: rgba(0, 218, 243, .08);
+            color: #7a8ba8;
+            border: 1px solid rgba(0, 218, 243, .15);
+        }
+
+        /* DRAWER */
+        .drawer-tr td {
+            padding: 0;
+            border-bottom: 1px solid rgba(65, 71, 84, 0.3);
+        }
+
+        .drawer-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: .75rem;
+            padding: .9rem 1rem .9rem 2.5rem;
+            background: rgba(6, 14, 32, 0.55);
+        }
+
+        .di-lbl {
+            font-size: .58rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: #7a8ba8;
+            margin-bottom: 2px;
+        }
+
+        .di-val {
+            font-family: monospace;
+            font-size: .76rem;
+            font-weight: 600;
+        }
+
+        .reason-row {
+            grid-column: 1/-1;
+        }
+
+        .reason-row .di-val {
+            font-size: .7rem;
+            color: #b0c9e8;
+            font-weight: 400;
+            line-height: 1.55;
+        }
+
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid rgba(65, 71, 84, 0.3);
+        }
+
+        .pg-info {
+            font-family: monospace;
+            font-size: .74rem;
+            color: #7a8ba8;
+        }
+
+        .pg-btns {
+            display: flex;
+            gap: .3rem;
+            align-items: center;
+        }
+
+        .pg-btn {
+            min-width: 32px;
+            height: 32px;
+            border-radius: 5px;
+            border: 1px solid rgba(65, 71, 84, 0.45);
+            background: rgba(19, 27, 46, 0.6);
+            color: #b0c9e8;
+            font-size: .74rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .18s;
+            font-family: monospace;
+            padding: 0 6px;
+            gap: 3px;
+            white-space: nowrap;
+        }
+
+        .pg-btn:hover:not(:disabled) {
+            border-color: #00daf3;
+            color: #00daf3;
+        }
+
+        .pg-btn:disabled {
+            opacity: .3;
+            cursor: not-allowed;
+        }
+
+        .pg-btn.active {
+            background: rgba(0, 218, 243, .15);
+            border-color: #00daf3;
+            color: #00daf3;
+            font-weight: 700;
+        }
+
+        /* WS DOT */
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .25
+            }
+        }
+
+        .ws-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .ws-on {
+            background: #00e297;
+            box-shadow: 0 0 6px #00e297;
+        }
+
+        .ws-rec {
+            background: #ffb300;
+            animation: blink .8s infinite;
+        }
+
+        .ws-off {
+            background: #ff4444;
+        }
+
+        /* FLASH */
+        @keyframes flash {
+            0% {
+                background: rgba(0, 218, 243, 0.18);
+            }
+
+            100% {
+                background: transparent;
+            }
+        }
+
+        .new-row td {
+            animation: flash 2s ease forwards;
+        }
+
+        /* EXPORT BTN */
+        .export-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            background: rgba(11, 19, 38, 0.8);
+            border: 1px solid rgba(65, 71, 84, 0.5);
+            border-radius: 6px;
+            font-size: .76rem;
+            font-weight: 600;
+            color: #e8edf5;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .export-btn:hover {
+            border-color: #00daf3;
+            color: #00daf3;
+        }
+
+        @media print {
+            body { background: white !important; color: black !important; }
+            header, .stat-strip, .filter-sel, .filter-input, .export-btn, .pagination, .drawer-grid, .material-symbols-outlined { display: none !important; }
+            #rec-count { display: none !important; }
+            table { border-collapse: collapse; width: 100%; border: 1px solid #ddd; }
+            th, td { border: 1px solid #ddd; padding: 6px; color: black !important; font-size: 10px !important; }
+            th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
+            h1 { color: black !important; text-align: center; }
+            h1::after { content: ' - Complete Archive Report'; }
+            span { color: black !important; }
+        }
+    </style>
+
+    
+
+</head>
+
+<body>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div style="display:flex;align-items:center;gap:1.25rem;">
+            <a href="dashboard.html" class="back-link">
+                <span class="material-symbols-outlined" style="font-size:15px">arrow_back</span>
+                Back to Dashboard
+            </a>
+            <div class="brand">
+                <span class="material-symbols-outlined msf" style="font-size:17px;color:#00daf3">shield</span>
+                <span style="color:#00daf3">THE SENTINEL</span>
+                <span style="color:#414754;font-weight:300">ARCHIVE</span>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.85rem;">
+            <div style="display:flex;align-items:center;gap:6px;font-family:monospace;font-size:.62rem;color:#b0c9e8;">
+                <span class="ws-dot ws-rec" id="wsDot"></span>
+                <span id="wsLabel">Live Feed: Connecting</span>
+            </div>
+            <button class="export-btn" onclick="exportCSV()">
+                <span class="material-symbols-outlined" style="font-size:15px">csv</span>
+                Export CSV
+            </button>
+            <button class="export-btn" style="background:rgba(0,100,255,0.2);color:#8cb4ff;border-color:rgba(0,100,255,0.4);" onclick="exportPDFContent()">
+                <span class="material-symbols-outlined" style="font-size:15px">picture_as_pdf</span>
+                Export PDF
+            </button>
+        </div>
+    </header>
+
+    <!-- PAGE HEADER -->
+    <div
+        style="padding:1.75rem 1.5rem 1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+        <div>
+            <h1
+                style="font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:700;letter-spacing:-.02em;margin-bottom:.3rem;">
+                Complete Log Archives</h1>
+            <p style="font-size:.8rem;color:#7a8ba8;">Full decision history from the Sentinel agent. Updates automatically every 10 seconds.</p>
+        </div>
+        <div class="stat-strip glass">
+            <div class="stat-item">
+                <div class="stat-val" id="st-total">—</div>
+                <div class="stat-lbl">Total Events</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val" style="color:#ff4444" id="st-block">—</div>
+                <div class="stat-lbl">Blocks</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val" style="color:#ffb300" id="st-alert">—</div>
+                <div class="stat-lbl">Alerts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val" style="color:#00daf3" id="st-monitor">—</div>
+                <div class="stat-lbl">Watchlisted</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-val" style="color:#00e297" id="st-allow">—</div>
+                <div class="stat-lbl">Allowed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div style="padding:0 1.5rem .9rem;display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+        <div style="flex:1;min-width:220px;position:relative;">
+            <span class="material-symbols-outlined"
+                style="position:absolute;left:.65rem;top:50%;transform:translateY(-50%);font-size:17px;color:#414754;">search</span>
+            <input class="filter-input" id="f-ip" placeholder="Filter by IP address..." oninput="applyFilters()" />
+        </div>
+        <select class="filter-sel" id="f-dec" onchange="applyFilters()">
+            <option value="">All Decisions</option>
+            <option value="BLOCK">BLOCK</option>
+            <option value="ALERT">ALERT</option>
+            <option value="MONITOR">MONITOR</option>
+            <option value="ALLOW">ALLOW</option>
+        </select>
+        <select class="filter-sel" id="f-sev" onchange="applyFilters()">
+            <option value="">All Severities</option>
+            <option value="Critical">Critical</option>
+            <option value="Warning">Warning</option>
+            <option value="Low">Low</option>
+        </select>
+        <select class="filter-sel" id="f-model" onchange="applyFilters()">
+            <option value="">All Models</option>
+            <option value="random_forest">Random Forest</option>
+            <option value="xgboost">XGBoost</option>
+            <option value="logistic_regression">Logistic Regression</option>
+        </select>
+        <div style="font-family:monospace;font-size:.72rem;color:#7a8ba8;white-space:nowrap;" id="rec-count">0 events
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div style="padding:0 1.5rem;overflow-x:auto;">
+        <table>
+            <colgroup>
+                <col class="col-expand" />
+                <col class="col-time" />
+                <col class="col-ip" />
+                <col class="col-cat" />
+                <col class="col-pred" />
+                <col class="col-sev" />
+                <col class="col-conf" />
+                <col class="col-dec" />
+                <col class="col-model" />
+                <col class="col-esc" />
+                <col class="col-req" />
+                <col class="col-atk" />
+                <col class="col-status" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Time</th>
+                    <th>Source IP</th>
+                    <th>Attack Category</th>
+                    <th>Prediction</th>
+                    <th>Severity</th>
+                    <th>ML Confidence</th>
+                    <th>Agent Action</th>
+                    <th>Model Used</th>
+                    <th>Escalation Risk</th>
+                    <th>Requests</th>
+                    <th>Attacks</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+                <tr>
+                    <td colspan="13"
+                        style="text-align:center;padding:3rem;color:#414754;font-family:monospace;font-size:.78rem;">
+                        Loading archive from backend...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+        <div class="pg-info" id="pg-info">Showing 0–0 of 0</div>
+        <div class="pg-btns" id="pg-btns"></div>
+    </div>
+
+    <script>
+        const API = 'http://127.0.0.1:8000';
+        const WS_URL = 'ws://127.0.0.1:8000/ws/feed';
+        const PER = 15;
+
+        let all = [];
+        let filtered = [];
+        let page = 1;
+        let ws;
+        let expandedKeys = new Set(); // track open drawers
+
+        // ── WebSocket ────────────────────────────────────────────
+        function connectWS() {
+            try {
+                ws = new WebSocket(WS_URL);
+                ws.onopen = () => { setWS('on', 'Live Feed: Active'); };
+                ws.onclose = () => { setWS('rec', 'Live Feed: Reconnecting'); setTimeout(connectWS, 3000); };
+                ws.onerror = () => ws.close();
+                ws.onmessage = e => {
+                    const d = JSON.parse(e.data);
+                    if (d.type === 'threat_event') prependLiveEvent(d);
+                };
+            } catch (e) { }
+        }
+
+        function setWS(cls, lbl) {
+            const dot = document.getElementById('wsDot');
+            dot.className = 'ws-dot ws-' + cls;
+            document.getElementById('wsLabel').textContent = lbl;
+        }
+
+        function prependLiveEvent(d) {
+            const row = buildRowFromWS(d);
+            all.unshift(row);
+            applyFilters(false);
+            updateStats();
+            setTimeout(() => {
+                if (page === 1) {
+                    const first = document.querySelector('#tbody tr:first-child');
+                    if (first) first.classList.add('new-row');
+                }
+            }, 80);
+        }
+
+        function buildRowFromWS(d) {
+            return {
+                time: new Date().toLocaleString(),
+                srcip: d.srcip || '—',
+                category: d.prediction === 'Attack' ? 'Unknown' : 'Normal',
+                prediction: d.prediction || '—',
+                confidence: d.confidence || 0,
+                decision: d.decision || '—',
+                model: d.selected_model || d.model || '—',
+                attacks: d.decision === 'BLOCK' ? 1 : 0,
+                blocks: d.decision === 'BLOCK' ? 1 : 0,
+                alerts: d.decision === 'ALERT' ? 1 : 0,
+                requests: 1,
+                is_escalating: false,
+                reason: d.reason || '',
+                first_seen: null,
+            };
+        }
+
+        // ── Load data ─────────────────────────────────────────────
+        async function loadData() {
+            try {
+                const r = await fetch(`${API}/evaluation/memory/active`);
+                if (!r.ok) throw new Error(r.status);
+                const d = await r.json();
+                const sums = d.ip_summaries || {};
+
+                all = Object.entries(sums).map(([ip, s]) => ({
+                    time: s.last_seen ? new Date(s.last_seen).toLocaleString() : '—',
+                    srcip: ip,
+                    category: (s.attack_types || ['Unknown'])[0],
+                    prediction: s.attacks > 0 ? 'Attack' : 'Normal',
+                    confidence: s.avg_confidence || 0,
+                    decision: s.blocks > 0 ? 'BLOCK'
+                        : s.alerts > 0 ? 'ALERT'
+                            : s.monitors > 0 ? 'MONITOR' : 'ALLOW',
+                    model: s.last_model || '—',
+                    attacks: s.attacks || 0,
+                    blocks: s.blocks || 0,
+                    alerts: s.alerts || 0,
+                    requests: s.requests || 0,
+                    is_escalating: s.is_escalating || false,
+                    reason: s.last_reason || '',
+                    first_seen: s.first_seen,
+                    false_positives: s.false_positives || 0,
+                }));
+
+                all.sort((a, b) => new Date(b.time) - new Date(a.time) || 0);
+                applyFilters(false);
+                updateStats();
+            } catch (e) {
+                document.getElementById('tbody').innerHTML =
+                    `<tr><td colspan="13" style="text-align:center;padding:3rem;color:#414754;font-family:monospace;font-size:.78rem;">
+        Backend offline or no data yet. Send predictions to populate.
+      </td></tr>`;
+            }
+        }
+
+        // ── Stats ─────────────────────────────────────────────────
+        function updateStats() {
+            const f = (dec) => all.filter(r => r.decision === dec).length;
+            document.getElementById('st-total').textContent = all.length;
+            document.getElementById('st-block').textContent = f('BLOCK');
+            document.getElementById('st-alert').textContent = f('ALERT');
+            document.getElementById('st-monitor').textContent = f('MONITOR');
+            document.getElementById('st-allow').textContent = f('ALLOW');
+        }
+
+        // ── Severity ──────────────────────────────────────────────
+        function getSev(row) {
+            if (row.blocks > 0 || row.confidence >= 0.90) return 'Critical';
+            if (row.confidence >= 0.60 || row.alerts > 0) return 'Warning';
+            return 'Low';
+        }
+
+        // ── Filter ────────────────────────────────────────────────
+        function applyFilters(resetPage = true) {
+            const ip = document.getElementById('f-ip').value.toLowerCase();
+            const dec = document.getElementById('f-dec').value;
+            const sev = document.getElementById('f-sev').value;
+            const mdl = document.getElementById('f-model').value;
+
+            filtered = all.filter(r =>
+                (!ip || r.srcip.includes(ip))
+                && (!dec || r.decision === dec)
+                && (!sev || getSev(r) === sev)
+                && (!mdl || r.model === mdl)
+            );
+
+            if (resetPage === true) page = 1;
+            renderTable();
+            renderPagination();
+            document.getElementById('rec-count').textContent =
+                `${filtered.length.toLocaleString()} event${filtered.length !== 1 ? 's' : ''}`;
+        }
+
+        // ── Render table ──────────────────────────────────────────
+        function renderTable() {
+            const tbody = document.getElementById('tbody');
+            const start = (page - 1) * PER;
+            const rows = filtered.slice(start, start + PER);
+
+            if (!rows.length) {
+                tbody.innerHTML = `<tr><td colspan="13" style="text-align:center;padding:3rem;color:#414754;font-family:monospace;font-size:.78rem;">No records match current filters.</td></tr>`;
+                return;
+            }
+
+            const decBadge = { BLOCK: 'b-block', ALERT: 'b-alert', MONITOR: 'b-monitor', ALLOW: 'b-allow' };
+            const sevBadge = { Critical: 'b-crit', Warning: 'b-warn', Low: 'b-low' };
+            const statusTxt = { BLOCK: 'BLOCK', ALERT: 'ALERT', MONITOR: 'MONITOR', ALLOW: 'ALLOW' };
+            const statusClr = { BLOCK: '#ff4444', ALERT: '#ffb300', MONITOR: '#00daf3', ALLOW: '#00e297' };
+            const ipClr = { BLOCK: '#ffb4ab', ALERT: '#ffb300', MONITOR: '#00daf3', ALLOW: '#00e297' };
+
+            tbody.innerHTML = '';
+            rows.forEach((row, i) => {
+                const idx = start + i;
+                const rowKey = row.srcip + '_' + row.time;
+                const sev = getSev(row);
+                const conf = row.confidence ? (row.confidence * 100).toFixed(1) + '%' : '—';
+                const model = row.model.replace(/_/g, ' ');
+
+                const tr = document.createElement('tr');
+                tr.dataset.idx = idx;
+                tr.onclick = () => toggleDrawer(tr, row, rowKey);
+                tr.innerHTML = `
+      <td style="color:#414754;padding:.8rem .5rem .8rem 1rem;">
+        <span class="material-symbols-outlined" style="font-size:13px;transition:transform .18s;" id="arr-${idx}">chevron_right</span>
+      </td>
+      <td style="font-family:monospace;font-size:.72rem;color:#7a8ba8;white-space:nowrap;">${row.time}</td>
+      <td style="font-family:monospace;font-weight:700;color:${ipClr[row.decision] || '#00daf3'}">${row.srcip}</td>
+      <td style="font-size:.8rem;">${row.category}</td>
+      <td style="color:${row.prediction === 'Attack' ? '#ffb4ab' : '#00e297'};font-weight:600;font-size:.8rem;">${row.prediction}</td>
+      <td><span class="badge ${sevBadge[sev] || 'b-warn'}">${sev}</span></td>
+      <td style="font-family:monospace;font-weight:600;font-size:.8rem;">${conf}</td>
+      <td><span class="badge ${decBadge[row.decision] || 'b-monitor'}">${row.decision}</span></td>
+      <td style="font-family:monospace;font-size:.72rem;color:#b0c9e8;">${model}</td>
+      <td style="color:${row.is_escalating ? '#ffb4ab' : '#414754'};font-weight:${row.is_escalating ? '700' : '400'};font-size:.8rem;">${row.is_escalating ? '⚠ YES' : 'No'}</td>
+      <td style="font-family:monospace;font-size:.8rem;">${row.requests}</td>
+      <td style="font-family:monospace;font-size:.8rem;color:${row.attacks > 0 ? '#ffb300' : '#414754'}">${row.attacks}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span style="width:6px;height:6px;border-radius:50%;background:${statusClr[row.decision] || '#414754'};flex-shrink:0;display:inline-block;"></span>
+          <span style="font-size:.76rem;">${statusTxt[row.decision] || '—'}</span>
+        </div>
+      </td>`;
+                tbody.appendChild(tr);
+                // Auto-expand if it was already open
+                if (expandedKeys.has(rowKey)) {
+                    toggleDrawer(tr, row, rowKey);
+                }
+            });
+        }
+
+        // ── Drawer ────────────────────────────────────────────────
+        function toggleDrawer(tr, row, rowKey) {
+            const key = rowKey || (row.srcip + '_' + row.time);
+            const next = tr.nextElementSibling;
+            if (next && next.classList.contains('drawer-tr')) {
+                next.remove();
+                tr.classList.remove('expanded');
+                const arr = document.getElementById('arr-' + tr.dataset.idx);
+                if (arr) arr.style.transform = '';
+                expandedKeys.delete(key);
+                return;
+            }
+            expandedKeys.add(key);
+            tr.classList.add('expanded');
+            const arr = document.getElementById('arr-' + tr.dataset.idx);
+            if (arr) arr.style.transform = 'rotate(90deg)';
+
+            const drawer = document.createElement('tr');
+            drawer.className = 'drawer-tr';
+            const conf = (row.confidence * 100).toFixed(3) + '%';
+            const fs = row.first_seen ? new Date(row.first_seen).toLocaleString() : '—';
+            drawer.innerHTML = `
+    <td colspan="13">
+      <div class="drawer-grid">
+        <div><div class="di-lbl">Total Requests</div><div class="di-val" style="color:#00daf3">${row.requests}</div></div>
+        <div><div class="di-lbl">Attack Events</div><div class="di-val" style="color:#ffb300">${row.attacks}</div></div>
+        <div><div class="di-lbl">Block Events</div><div class="di-val" style="color:#ffb4ab">${row.blocks}</div></div>
+        <div><div class="di-lbl">False Positives</div><div class="di-val">${row.false_positives || 0}</div></div>
+        <div><div class="di-lbl">Avg Confidence</div><div class="di-val" style="color:#00e297">${conf}</div></div>
+        <div><div class="di-lbl">First Seen</div><div class="di-val" style="font-size:.7rem">${fs}</div></div>
+        ${row.reason ? `<div class="reason-row"><div class="di-lbl">Agent Reason</div><div class="di-val">${row.reason}</div></div>` : ''}
+      </div>
+    </td>`;
+            tr.after(drawer);
+        }
+
+        // ── Pagination ────────────────────────────────────────────
+        function renderPagination() {
+            const total = filtered.length;
+            const pages = Math.ceil(total / PER) || 1;
+            const start = Math.min((page - 1) * PER + 1, total);
+            const end = Math.min(page * PER, total);
+
+            document.getElementById('pg-info').textContent =
+                `Showing ${start.toLocaleString()}–${end.toLocaleString()} of ${total.toLocaleString()} events`;
+
+            const cont = document.getElementById('pg-btns');
+            cont.innerHTML = '';
+
+            const mkBtn = (label, onclick, disabled, active, isIcon) => {
+                const b = document.createElement('button');
+                b.className = 'pg-btn' + (active ? ' active' : '');
+                b.disabled = disabled;
+                if (isIcon) b.innerHTML = label;
+                else b.textContent = label;
+                if (!disabled && onclick) b.onclick = onclick;
+                return b;
+            };
+
+            // Prev
+            cont.appendChild(mkBtn(
+                '<span class="material-symbols-outlined" style="font-size:14px">chevron_left</span> Prev',
+                () => goPage(page - 1), page <= 1, false, true
+            ));
+
+            // Page numbers
+            let nums = [];
+            if (pages <= 7) {
+                nums = Array.from({ length: pages }, (_, i) => i + 1);
+            } else {
+                nums = [1];
+                if (page > 3) nums.push('…');
+                for (let p = Math.max(2, page - 1); p <= Math.min(pages - 1, page + 1); p++) nums.push(p);
+                if (page < pages - 2) nums.push('…');
+                nums.push(pages);
+            }
+
+            nums.forEach(n => {
+                if (n === '…') {
+                    const b = mkBtn('…', null, true, false, false);
+                    b.style.cursor = 'default';
+                    cont.appendChild(b);
+                } else {
+                    cont.appendChild(mkBtn(n, () => goPage(n), false, n === page, false));
+                }
+            });
+
+            // Next
+            cont.appendChild(mkBtn(
+                'Next <span class="material-symbols-outlined" style="font-size:14px">chevron_right</span>',
+                () => goPage(page + 1), page >= pages, false, true
+            ));
+        }
+
+        function goPage(p) {
+            page = p;
+            renderTable();
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ── Export ────────────────────────────────────────────────
+        function exportCSV() {
+            const headers = ['Time', 'Source IP', 'Attack Category', 'Prediction', 'Severity',
+                'ML Confidence', 'Agent Action', 'Model Used', 'Escalating',
+                'Requests', 'Attacks', 'Blocks', 'False Positives', 'Status', 'Agent Reason'];
+            const statusTxt = { BLOCK: 'BLOCK', ALERT: 'ALERT', MONITOR: 'MONITOR', ALLOW: 'ALLOW' };
+
+            const rows = filtered.map(r => [
+                r.time, r.srcip, r.category, r.prediction, getSev(r),
+                r.confidence ? (r.confidence * 100).toFixed(1) + '%' : '—',
+                r.decision, r.model, r.is_escalating ? 'Yes' : 'No',
+                r.requests, r.attacks, r.blocks, r.false_positives || 0,
+                statusTxt[r.decision] || '—',
+                (r.reason || '').replace(/,/g, ' ').replace(/\n/g, ' ')
+            ]);
+
+            const csv = [headers, ...rows]
+                .map(r => r.map(v => `"${v}"`).join(','))
+                .join('\n');
+
+            const a = document.createElement('a');
+            a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            a.download = `sentinel_archive_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
+            a.click();
+        }
+
+        function exportPDFContent() {
+            const statusTxt = { BLOCK: 'BLOCK', ALERT: 'ALERT', MONITOR: 'MONITOR', ALLOW: 'ALLOW' };
+            const getSevLabel = r => {
+                const conf = r.confidence || 0;
+                if (r.decision === 'BLOCK' || conf > 0.85) return 'Critical';
+                if (r.decision === 'ALERT' || conf > 0.65) return 'Warning';
+                return 'Low';
+            };
+
+            const headers = [
+                'Timestamp', 'Source IP', 'Category', 'Prediction',
+                'Severity', 'Confidence', 'Agent Action', 'Model',
+                'Escalation', 'Requests', 'Attacks', 'Blocks', 'Status'
+            ];
+
+            const rows = filtered.map(r => [
+                r.time,
+                r.srcip,
+                r.category || '—',
+                r.prediction || '—',
+                getSevLabel(r),
+                r.confidence ? (r.confidence * 100).toFixed(1) + '%' : '—',
+                r.decision || '—',
+                (r.model || '—').replace(/_/g, ' '),
+                r.is_escalating ? 'YES' : 'No',
+                r.requests || 0,
+                r.attacks || 0,
+                r.blocks || 0,
+                statusTxt[r.decision] || '—'
+            ]);
+
+            const ts = new Date().toLocaleString();
+            const total = filtered.length;
+
+            const colWidths = ['14%','9%','8%','8%','7%','7%','8%','9%','7%','5%','5%','5%','8%'];
+            const colColors = {
+                'BLOCK': '#ff4444', 'ALERT': '#ffb300', 'MONITOR': '#00daf3',
+                'WATCHLIST': '#00daf3', 'ALLOW': '#00e297'
+            };
+            const sevColors = { 'Critical': '#ff4444', 'Warning': '#ffb300', 'Low': '#7a8ba8' };
+
+            let tableRows = rows.map(row => {
+                const actionColor = colColors[row[6]] || '#333';
+                const sevColor = sevColors[row[4]] || '#333';
+                return `<tr>
+                    <td>${row[0]}</td>
+                    <td style="font-family:monospace;font-weight:700">${row[1]}</td>
+                    <td>${row[2]}</td>
+                    <td style="color:${row[3]==='Attack'?'#c0392b':'#1a7a4a'};font-weight:600">${row[3]}</td>
+                    <td style="color:${sevColor};font-weight:600">${row[4]}</td>
+                    <td style="font-family:monospace">${row[5]}</td>
+                    <td style="color:${actionColor};font-weight:700">${row[6]}</td>
+                    <td style="font-family:monospace;font-size:9px">${row[7]}</td>
+                    <td style="color:${row[8]==='YES'?'#c0392b':'#555'};font-weight:${row[8]==='YES'?'700':'400'}">${row[8]}</td>
+                    <td style="font-family:monospace">${row[9]}</td>
+                    <td style="font-family:monospace;color:${parseInt(row[10])>0?'#e67e22':'#555'}">${row[10]}</td>
+                    <td style="font-family:monospace;color:${parseInt(row[11])>0?'#c0392b':'#555'}">${row[11]}</td>
+                    <td style="color:${actionColor}">${row[12]}</td>
+                </tr>`;
+            }).join('');
+
+            const htmlContent = `
+            <div style="font-family: Arial, sans-serif; font-size: 10px; color: #222; background: #fff; padding: 16px;">
+                <h1 style="font-size: 16px; font-weight: 700; margin-bottom: 4px; color: #0a1628;">&#128737; The Sentinel — Complete Log Archive Report</h1>
+                <div style="font-size: 9px; color: #666; margin-bottom: 12px; display: flex; gap: 24px;">
+                  <span>Generated: ${ts}</span>
+                  <span>Total Records: ${total.toLocaleString()}</span>
+                  <span>Filter: ${document.getElementById('f-ip')?.value || 'All IPs'} | ${document.getElementById('f-dec')?.value || 'All Decisions'}</span>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+                  <colgroup>${colWidths.map(w => `<col style="width:${w}">`).join('')}</colgroup>
+                  <thead style="background: #0a1628; color: #fff;"><tr>${headers.map(h => `<th style="padding: 6px 5px; text-align: left; font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; overflow: hidden; border: 1px solid #ccc;">${h}</th>`).join('')}</tr></thead>
+                  <tbody>${tableRows}</tbody>
+                </table>
+            </div>`;
+
+            const container = document.createElement('div');
+            container.innerHTML = htmlContent;
+            
+            // Apply html2pdf
+            const opt = {
+              margin:       10,
+              filename:     `sentinel_archive_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.pdf`,
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2 },
+              jsPDF:        { unit: 'mm', format: 'a3', orientation: 'landscape' }
+            };
+            
+            html2pdf().set(opt).from(container).save();
+        }
+
+        // ── Init ──────────────────────────────────────────────────
+        connectWS();
+        loadData();
+    </script>
+
+    
+
+</body>
+
+</html>

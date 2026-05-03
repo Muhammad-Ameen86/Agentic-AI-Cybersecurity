@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>The Sentinel | Advanced Configuration</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Fonts / Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <!-- ApexCharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-container": "#002f35",
+                        "outline-variant": "#414754",
+                        "on-secondary": "#19324b",
+                        "secondary": "#b0c9e8",
+                        "on-secondary-fixed": "#011d35",
+                        "surface-container-high": "#222a3d",
+                        "secondary-fixed-dim": "#b0c9e8",
+                        "surface-dim": "#0b1326",
+                        "surface-container-highest": "#2d3449",
+                        "surface-container-lowest": "#060e20",
+                        "outline": "#8b90a0",
+                        "primary-fixed": "#9cf0ff",
+                        "on-tertiary-container": "#00311d",
+                        "surface-container": "#171f33",
+                        "primary-container": "#009fb2",
+                        "secondary-fixed": "#d1e4ff",
+                        "on-primary-fixed-variant": "#004f58",
+                        "surface-tint": "#00daf3",
+                        "tertiary-fixed": "#4dffb2",
+                        "background": "#0b1326",
+                        "secondary-container": "#314863",
+                        "inverse-primary": "#006875",
+                        "tertiary-container": "#00a56d",
+                        "tertiary": "#00e297",
+                        "primary-fixed-dim": "#00daf3",
+                        "on-primary": "#00363d",
+                        "inverse-on-surface": "#283044",
+                        "tertiary-fixed-dim": "#00e297",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "surface-container-low": "#131b2e",
+                        "on-secondary-container": "#9fb7d6",
+                        "surface-bright": "#31394d",
+                        "on-primary-fixed": "#001f24",
+                        "on-tertiary-fixed-variant": "#005234",
+                        "surface": "#0b1326",
+                        "on-surface": "#dae2fd",
+                        "on-tertiary-fixed": "#002112",
+                        "error": "#ffb4ab",
+                        "primary": "#00daf3",
+                        "error-container": "#93000a",
+                        "on-tertiary": "#003822",
+                        "surface-variant": "#2d3449",
+                        "on-surface-variant": "#c1c6d7",
+                        "on-secondary-fixed-variant": "#314863",
+                        "on-background": "#dae2fd",
+                        "inverse-surface": "#dae2fd"
+                    },
+                    fontFamily: {
+                        headline: ["Space Grotesk"],
+                        body: ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(19, 27, 46, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(65, 71, 84, 0.4);
+        }
+
+        .cyber-glow {
+            box-shadow: 0 0 20px rgba(0, 218, 243, 0.15);
+        }
+
+        .cyber-glow-error {
+            box-shadow: 0 0 20px rgba(255, 180, 171, 0.15);
+        }
+
+        /* Auto Scroll Hide */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 2px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #060e20;
+            border-radius: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-button {
+            display: none;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(65, 71, 84, 0.6);
+        }
+
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #060e20 transparent;
+        }
+
+        /* Animations */
+        @keyframes scanline {
+            0% {
+                transform: translateY(-100%);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        .animate-scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, rgba(0, 218, 243, 0.5), transparent);
+            opacity: 0.3;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        .fade-in-down {
+            animation: fadeInDown 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .msf {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Profile Dropdown */
+        #profile-dropdown {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            width: 290px;
+            z-index: 200;
+            animation: fadeInDown 0.2s ease;
+        }
+    </style>
+
+
+
+
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-white font-body overflow-x-hidden selection:bg-primary selection:text-[#00363d]">
+    <div class="animate-scanline"></div>
+
+    <!-- SideNavBar -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 z-[60] bg-[#02050b] border-r border-outline-variant/30 flex flex-col py-6">
+        <div class="px-6 mb-10">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center border border-primary/40 shadow-[0_0_15px_rgba(0,218,243,0.3)]">
+                    <span class="material-symbols-outlined text-primary"
+                        style="font-variation-settings: 'FILL' 1;">security</span>
+                </div>
+                <div>
+                    <h1 class="text-primary font-headline font-bold tracking-tight">The Sentinel</h1>
+                    <p class="text-[10px] text-secondary tracking-[0.2em] uppercase opacity-70"></p>
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all"
+                href="dashboard.html">
+                <span class="material-symbols-outlined">space_dashboard</span><span>Dashboard</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all"
+                href="network_nodes.html">
+                <span class="material-symbols-outlined">lan</span><span>Network Nodes</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all"
+                href="ml_models.html">
+                <span class="material-symbols-outlined">psychology</span><span>ML Models</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary/70 hover:text-primary hover:bg-surface transition-all"
+                href="policies.html">
+                <span class="material-symbols-outlined">gavel</span><span>Policies</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary bg-primary/10 border-l-4 border-primary font-medium transition-all"
+                href="settings.html">
+                <span class="material-symbols-outlined">settings</span><span>Settings</span>
+            </a>
+        </nav>
+        <div class="px-4 mt-auto space-y-2">
+            <button id="btn-deploy-agent" onclick="toggleModal('deploy-modal')"
+                class="w-full py-3 bg-primary text-[#00363d] rounded-md font-bold flex items-center justify-center gap-2 hover:bg-[#9cf0ff] hover:shadow-[0_0_20px_rgba(0,218,243,0.5)] transition-all">
+                <span class="material-symbols-outlined">rocket_launch</span> Deploy Agent
+            </button>
+            <button id="btn-stop-agent" onclick="stopAgent()"
+                class="hidden w-full py-3 bg-error/20 text-error border border-error/40 rounded-md font-bold flex items-center justify-center gap-2 hover:bg-error/30 hover:shadow-[0_0_15px_rgba(255,180,171,0.3)] transition-all text-sm">
+                <span class="material-symbols-outlined" style="font-size:18px">stop_circle</span> Stop Agent
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="ml-64 min-h-screen relative">
+        <!-- TopNavBar (Glassmorphic) -->
+        <header
+            class="sticky top-0 z-50 flex justify-between items-center w-full px-8 py-4 backdrop-blur-md bg-background/80 border-b border-outline-variant/30">
+            <div class="flex items-center gap-6">
+                <div class="relative group">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <span class="material-symbols-outlined text-outline-variant">search</span>
+                    </span>
+                    <input
+                        class="bg-surface border border-outline-variant/30 focus:border-primary text-sm rounded-lg focus:ring-1 focus:ring-primary w-64 pl-10 py-2"
+                        placeholder="Scan network assets..." type="text" />
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <!-- WebSocket Status Indicator -->
+                <div class="flex items-center gap-2 px-3 py-1 bg-surface rounded-full border border-outline-variant/30">
+                    <span class="relative flex h-2 w-2">
+                        <span id="ws-status-ping"
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-tertiary"></span>
+                        <span id="ws-status-dot" class="relative inline-flex rounded-full h-2 w-2 bg-tertiary"></span>
+                    </span>
+                    <span id="ws-status-text"
+                        class="text-[10px] uppercase tracking-wider text-tertiary font-bold">Online</span>
+                </div>
+
+                <div class="relative" id="user-menu-wrap">
+                    <div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30 cursor-pointer select-none"
+                        onclick="toggleUserMenu()">
+                        <span class="text-right">
+                            <p class="text-xs font-bold leading-tight" id="nav-username">Muhammad Ameen</p>
+                            <p class="text-[10px] text-primary leading-tight">SOC Analyst</p>
+                        </span>
+                        <div class="w-9 h-9 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-sm"
+                            id="nav-avatar">MA</div>
+                    </div>
+
+                    <!-- Profile Dropdown Panel -->
+                    <div class="hidden absolute right-0 top-[calc(100%+8px)] w-[290px] z-[200] bg-[#02050b] rounded-xl shadow-2xl border border-outline-variant/40 overflow-hidden"
+                        id="profile-dropdown">
+                        <!-- User Info Header -->
+                        <div class="px-4 py-4 border-b border-outline-variant/30 bg-surface-container-lowest">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-bold text-base"
+                                    id="dd-avatar">MA</div>
+                                <div>
+                                    <p class="text-sm font-bold" id="dd-name">Muhammad Ameen</p>
+                                    <p class="text-[11px] text-primary font-mono" id="dd-email">analyst@sentinel.io</p>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="w-1.5 h-1.5 rounded-full bg-tertiary animate-pulse inline-block"></span>
+                                    <span class="text-[10px] font-mono text-tertiary uppercase tracking-widest">Session
+                                        Active</span>
+                                </div>
+                                <span class="text-[10px] font-mono text-secondary/40" id="dd-login-time">—</span>
+                            </div>
+                        </div>
+                        <!-- Menu Items -->
+                        <div class="py-2">
+                            <button onclick="window.location.href=\'settings.html\'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">manage_accounts</span>
+                                Account Settings
+                            </button>
+                            <button
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">notifications</span>
+                                Alerts &amp; Notifications
+                            </button>
+
+                            <div class="border-t border-outline-variant/20 my-1 mx-4"></div>
+                            <button onclick="window.location.href='network_nodes.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">lan</span>
+                                Network Nodes
+                            </button>
+                            <button onclick="window.location.href='ml_models.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">psychology</span>
+                                ML Models
+                            </button>
+                            <button onclick="window.location.href='policies.html'"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-secondary hover:text-primary hover:bg-white/5 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">gavel</span>
+                                Policy Settings
+                            </button>
+                            <div class="border-t border-outline-variant/20 my-1 mx-4"></div>
+                            <button onclick="signOut()"
+                                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error/10 transition-colors text-left">
+                                <span class="material-symbols-outlined" style="font-size:18px">logout</span>
+                                Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="p-8 max-w-[1400px] mx-auto fade-in-down">
+            <!-- Header -->
+            <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <h2 class="text-3xl font-headline font-bold flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-4xl">settings</span> Advanced
+                        Configuration
+                    </h2>
+                    <p class="text-secondary/70 mt-2">Manage command center access, LLM core tuning, and external
+                        intelligence networks.</p>
+                </div>
+                <button onclick="saveConfiguration()"
+                    class="px-8 py-3.5 bg-primary text-[#00363d] rounded-lg font-bold hover:bg-[#9cf0ff] hover:shadow-[0_0_20px_rgba(0,218,243,0.4)] transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined" style="font-size:18px">save</span> Save Configuration
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
+                <!-- Settings Nav (Left) -->
+                <div class="lg:col-span-3 space-y-2 sticky top-24 h-max">
+                    <button onclick="switchTab('profile')" id="tab-profile"
+                        class="settings-tab w-full flex items-center gap-3 px-4 py-3.5 rounded-lg bg-primary/10 text-primary border-l-4 border-primary transition-all text-sm font-bold shadow-[inset_4px_0_0_0_rgba(0,218,243,1)]">
+                        <span class="material-symbols-outlined">person</span> Security &amp; Access
+                    </button>
+                    <button onclick="switchTab('ai')" id="tab-ai"
+                        class="settings-tab w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-secondary/70 hover:bg-surface-bright/30 hover:text-white transition-all text-sm font-medium border-l-4 border-transparent">
+                        <span class="material-symbols-outlined">memory</span> AI Core Tuning
+                    </button>
+                    <button onclick="switchTab('data')" id="tab-data"
+                        class="settings-tab w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-secondary/70 hover:bg-surface-bright/30 hover:text-white transition-all text-sm font-medium border-l-4 border-transparent">
+                        <span class="material-symbols-outlined">database</span> Data &amp; Logs
+                    </button>
+                    <button onclick="switchTab('alerts')" id="tab-alerts"
+                        class="settings-tab w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-secondary/70 hover:bg-surface-bright/30 hover:text-white transition-all text-sm font-medium border-l-4 border-transparent">
+                        <span class="material-symbols-outlined">notifications_active</span> Alerts &amp; Notifications
+                    </button>
+                </div>
+
+                <!-- Settings Content (Right) -->
+                <div class="lg:col-span-9 relative min-h-[600px]">
+
+                    <!-- TAB 1: SECURITY & ACCESS -->
+                    <div id="content-profile" class="settings-content space-y-8 animate-fadeIn">
+                        <!-- Profile Box -->
+                        <div
+                            class="glass-panel p-8 rounded-xl border-t-2 border-primary relative overflow-hidden group">
+                            <div
+                                class="absolute right-0 top-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none group-hover:bg-primary/10 transition-colors duration-700">
+                            </div>
+                            <h3
+                                class="font-headline font-bold text-xl mb-6 flex items-center gap-2 text-white border-b border-outline-variant/20 pb-4">
+                                <span class="material-symbols-outlined text-primary">badge</span> Operative Credentials
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] uppercase font-bold text-secondary tracking-widest">Operative
+                                        Name</label>
+                                    <input type="text" id="operative-name" value=""
+                                        class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3.5 text-sm focus:border-primary focus:ring-1 focus:ring-primary/50 text-white transition-all outline-none" />
+                                </div>
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] uppercase font-bold text-secondary tracking-widest">Registry
+                                        Email</label>
+                                    <input type="email" id="registry-email" value="" readonly
+                                        class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3.5 text-sm text-secondary/70 transition-all outline-none cursor-not-allowed" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password Change & 2FA -->
+                        <div
+                            class="glass-panel p-8 rounded-xl border-t-2 border-secondary relative overflow-hidden group">
+                            <h3
+                                class="font-headline font-bold text-xl mb-6 flex items-center gap-2 text-white border-b border-outline-variant/20 pb-4">
+                                <span class="material-symbols-outlined text-secondary">lock</span> Authentication &amp;
+                                Access</h3>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                                <div class="space-y-4">
+                                    <p class="text-sm font-bold text-white mb-2">Change Password</p>
+                                    <div class="space-y-2">
+                                        <input type="password" id="current-password" placeholder="Current Password"
+                                            class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary/50 text-white transition-all outline-none" />
+                                    </div>
+                                    <div class="space-y-2">
+                                        <input type="password" id="new-password" placeholder="New Password"
+                                            class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary/50 text-white transition-all outline-none" />
+                                    </div>
+                                    <div class="space-y-2">
+                                        <input type="password" id="confirm-password" placeholder="Confirm New Password"
+                                            class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary/50 text-white transition-all outline-none" />
+                                    </div>
+                                    <button onclick="changePassword()"
+                                        class="px-4 py-2 mt-2 bg-surface-bright text-xs rounded hover:bg-white hover:text-black transition-colors font-bold shadow-lg">Update
+                                        Password</button>
+                                </div>
+                                <div class="space-y-5">
+                                    <div
+                                        class="flex items-center justify-between p-4 rounded-lg bg-surface-container-lowest border border-outline-variant/20">
+                                        <div>
+                                            <p class="font-bold text-white text-sm">Two-Factor Auth (2FA)</p>
+                                            <p class="text-xs text-secondary/70 mt-1">Require Authenticator App on
+                                                login.</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" checked class="sr-only peer">
+                                            <div
+                                                class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[#00363d] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary">
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div
+                                        class="flex items-center justify-between p-4 rounded-lg bg-surface-container-lowest border border-outline-variant/20">
+                                        <div>
+                                            <p class="font-bold text-white text-sm">Strict Session Timeout</p>
+                                            <p class="text-xs text-secondary/70 mt-1">Force logout after 15 mins of
+                                                inactivity.</p>
+                                        </div>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="strict-session" class="sr-only peer"
+                                                onchange="if(this.checked) showToast('User will automatically sign out in next 15 minutes')">
+                                            <div
+                                                class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[#00363d] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary">
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: AI CORE TUNING -->
+                    <div id="content-ai" class="settings-content space-y-8 hidden animate-fadeIn">
+                        <div
+                            class="glass-panel p-8 rounded-xl border-t-2 border-tertiary relative overflow-hidden group">
+                            <div
+                                class="absolute right-0 top-0 w-64 h-64 bg-tertiary/5 rounded-full blur-[80px] pointer-events-none group-hover:bg-tertiary/10 transition-colors duration-700">
+                            </div>
+                            <h3
+                                class="font-headline font-bold text-xl mb-6 flex items-center gap-2 text-white border-b border-outline-variant/20 pb-4">
+                                <span class="material-symbols-outlined text-tertiary">memory</span> LangChain LLM
+                                Configuration</h3>
+
+                            <div class="space-y-6">
+                                <div>
+                                    <label
+                                        class="text-[10px] uppercase font-bold text-secondary tracking-widest mb-2 block">Primary
+                                        Reasoning Engine</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="ai-model-container">
+                                        <div class="col-span-3 text-center text-secondary/50 text-xs py-4">Loading
+                                            models from configuration...</div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                                    <div class="space-y-2">
+                                        <div class="flex justify-between">
+                                            <label
+                                                class="text-[10px] uppercase font-bold text-secondary tracking-widest">Decision
+                                                Strictness (Temperature)</label>
+                                            <span id="ai-strictness-val"
+                                                class="text-[10px] font-mono text-tertiary">0.1</span>
+                                        </div>
+                                        <input id="ai-strictness" type="range" min="0" max="1" step="0.1" value="0.1"
+                                            class="w-full accent-tertiary"
+                                            oninput="document.getElementById('ai-strictness-val').textContent = this.value" />
+                                        <div class="flex justify-between text-[9px] uppercase text-secondary/50">
+                                            <span>Strict Rules</span>
+                                            <span>Creative Analysis</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label
+                                            class="text-[10px] uppercase font-bold text-secondary tracking-widest">Max
+                                            Token Memory (Context Window)</label>
+                                        <select id="ai-context"
+                                            class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3.5 text-sm focus:border-tertiary focus:ring-1 focus:ring-tertiary/50 text-white transition-all outline-none">
+                                            <option value="128k">128,000 Tokens (Full PCAP History)</option>
+                                            <option value="64k">64,000 Tokens</option>
+                                            <option value="32k">32,000 Tokens (High Speed)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: DATA & LOGS -->
+                    <div id="content-data" class="settings-content space-y-8 hidden animate-fadeIn">
+                        <div class="glass-panel p-8 rounded-xl border-t-2 border-error relative overflow-hidden group">
+                            <h3
+                                class="font-headline font-bold text-xl mb-6 flex items-center gap-2 text-white border-b border-outline-variant/20 pb-4">
+                                <span class="material-symbols-outlined text-error">database</span> Log Management</h3>
+
+                            <div class="space-y-6">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] uppercase font-bold text-secondary tracking-widest">Data
+                                        Retention Policy</label>
+                                    <select id="data-retention"
+                                        class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3.5 text-sm focus:border-error focus:ring-1 focus:ring-error/50 text-white transition-all outline-none">
+                                        <option value="3h">Last 3 Hours</option>
+                                        <option value="8h">Last 8 Hours</option>
+                                        <option value="24h">Last 24 Hours </option>
+                                        <option value="7d">Last 7 Days</option>
+                                        <option value="30d">Last 30 Days</option>
+                                        <option value="0">Unlimited</option>
+                                    </select>
+                                    <p class="text-[10px] text-secondary/50 mt-1">Saving this policy will immediately
+                                        delete records from the database that fall outside the selected window.</p>
+                                </div>
+                                <div class="mt-8 pt-6 border-t border-error/20">
+                                    <h4 class="font-bold text-error mb-2">Danger Zone</h4>
+                                    <p class="text-xs text-secondary/70 mb-4">Permanently delete all threat logs and
+                                        simulation history from the MongoDB database. This action cannot be undone.</p>
+                                    <button onclick="purgeDatabase()"
+                                        class="px-6 py-2.5 bg-error/20 text-error border border-error/50 rounded hover:bg-error hover:text-white transition-colors font-bold text-sm shadow-[0_0_15px_rgba(255,180,171,0.2)]">Purge
+                                        Database</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: ALERTS & NOTIFICATIONS -->
+                    <div id="content-alerts" class="settings-content space-y-8 hidden animate-fadeIn">
+                        <div
+                            class="glass-panel p-8 rounded-xl border-t-2 border-tertiary relative overflow-hidden group">
+                            <h3
+                                class="font-headline font-bold text-xl mb-6 flex items-center gap-2 text-white border-b border-outline-variant/20 pb-4">
+                                <span class="material-symbols-outlined text-tertiary">notifications_active</span> Alert
+                                Preferences</h3>
+
+                            <div class="space-y-5">
+                                <div
+                                    class="flex items-center justify-between p-4 rounded-lg bg-surface-container-lowest border border-outline-variant/20">
+                                    <div>
+                                        <p class="font-bold text-white text-sm">Audio Alerts</p>
+                                        <p class="text-xs text-secondary/70 mt-1">Play a warning sound when the agent
+                                            blocks a threat.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="setting-audio" class="sr-only peer">
+                                        <div
+                                            class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[#00363d] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-tertiary">
+                                        </div>
+                                    </label>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between p-4 rounded-lg bg-surface-container-lowest border border-outline-variant/20">
+                                    <div>
+                                        <p class="font-bold text-white text-sm">Desktop Push Notifications</p>
+                                        <p class="text-xs text-secondary/70 mt-1">Show browser native notifications for
+                                            critical blocks.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="setting-desktop" class="sr-only peer"
+                                            onchange="requestNotificationPermission(this)">
+                                        <div
+                                            class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[#00363d] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-tertiary">
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="space-y-2 mt-4">
+                                    <label
+                                        class="text-[10px] uppercase font-bold text-secondary tracking-widest">Severity
+                                        Filter</label>
+                                    <select id="setting-severity"
+                                        class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3.5 text-sm focus:border-tertiary focus:ring-1 focus:ring-tertiary/50 text-white transition-all outline-none">
+                                        <option value="all">Show All Threat Notifications</option>
+                                        <option value="blocks">Only Show Blocks &amp; Alerts</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- end col-span-9 -->
+            </div><!-- end grid -->
+        </div><!-- end p-8 -->
+
+    </main>
+
+
+
+    <div id="toast-notification"
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 opacity-0 pointer-events-none translate-y-4 transition-all duration-300 z-[9999] flex items-center gap-3 px-6 py-4 bg-[#111827] border border-outline-variant/40 rounded-xl shadow-2xl">
+        <span class="material-symbols-outlined text-tertiary"
+            style="font-variation-settings: 'FILL' 1;">check_circle</span>
+        <span id="toast-message" class="text-white font-bold text-sm tracking-widest uppercase">ALL SYSTEMS
+            OPTIMIZED</span>
+    </div>
+
+    <script>
+
+        let currentActiveTab = 'profile';
+        let _activeModelId = null;
+
+        // ── RETENTION HELPER ───────────────────────────────────────────────────
+        function retentionHours(val) {
+            if (val === '3h') return 3;
+            if (val === '8h') return 8;
+            if (val === '24h') return 24;
+            if (val === '7d') return 168;
+            if (val === '30d') return 720;
+            return 0; // unlimited
+        }
+
+        // ── LOAD MODELS FROM BACKEND ───────────────────────────────────────────
+        async function loadModelsFromBackend() {
+            const container = document.getElementById('ai-model-container');
+            if (!container) return;
+            console.log("[Sentinel] Loading AI models from backend...");
+            try {
+                const res = await fetch('http://127.0.0.1:8000/evaluation/models/available');
+                const data = await res.json();
+                console.log("[Sentinel] Models received:", data);
+                const models = data.models || [];
+                const activeProvider = (data.active_provider || '').toLowerCase();
+                if (models.length === 0) {
+                    container.innerHTML = '<div class="col-span-3 text-center text-error text-xs py-4">No LLM API keys found in .env</div>';
+                    return;
+                }
+                container.innerHTML = '';
+                models.forEach(m => {
+                    const isActive = m.id === activeProvider;
+                    const btn = document.createElement('button');
+                    btn.id = 'model-' + m.id;
+                    btn.setAttribute('data-model-id', m.id);
+                    btn.className = isActive
+                        ? 'ai-model-btn border-2 border-tertiary bg-tertiary/10 rounded-lg p-4 text-left relative overflow-hidden'
+                        : 'ai-model-btn border border-outline-variant/30 bg-surface-container-lowest rounded-lg p-4 text-left hover:border-tertiary/50 transition-colors relative overflow-hidden';
+                    btn.innerHTML = `<div class="status-dot ${isActive ? '' : 'hidden'} absolute top-2 right-2 w-2 h-2 rounded-full bg-tertiary animate-pulse"></div><p class="text-[9px] uppercase tracking-widest text-secondary/50 mb-1">${m.provider}</p><p class="font-bold ${isActive ? 'text-tertiary' : 'text-white'} text-sm model-name">${m.model}</p><p class="text-xs text-secondary/70 mt-1">${m.description}</p>`;
+                    btn.addEventListener('click', () => selectAIModel(btn));
+                    if (isActive) _activeModelId = m.id;
+                    container.appendChild(btn);
+                });
+                // Restore user's saved selection
+                const saved = localStorage.getItem('ai_primary_model');
+                if (saved) { const s = document.getElementById('model-' + saved); if (s) selectAIModel(s); }
+            } catch (e) {
+                container.innerHTML = '<div class="col-span-3 text-center text-error text-xs py-4">Backend offline — cannot load models</div>';
+            }
+        }
+
+        // ── APPLY RETENTION POLICY TO DB ──────────────────────────────────────
+        async function applyRetentionPolicy(val) {
+            const hours = retentionHours(val);
+            if (hours === 0) return;
+            try {
+                const res = await fetch(`http://127.0.0.1:8000/evaluation/decisions/purge-by-age?hours=${hours}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok && data.deleted_count > 0) showToast(`CLEANED ${data.deleted_count} OLD RECORDS`);
+            } catch (e) { /* backend offline — policy still saved locally */ }
+        }
+
+        // ── SESSION-AWARE INITIALIZATION ───────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            const _sess = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+
+            const nameInput = document.getElementById('operative-name');
+            if (nameInput && _sess.username) nameInput.value = _sess.username;
+            const emailInput = document.getElementById('registry-email');
+            if (emailInput && _sess.email) emailInput.value = _sess.email;
+
+            // Restore ALL settings regardless of which tab is open
+            const strictCb = document.getElementById('strict-session');
+            if (strictCb) strictCb.checked = localStorage.getItem('strict_session_timeout') === 'true';
+            const dr = document.getElementById('data-retention');
+            if (dr && localStorage.getItem('data_retention')) dr.value = localStorage.getItem('data_retention');
+            const aa = document.getElementById('setting-audio');
+            if (aa) aa.checked = localStorage.getItem('audio_alerts') === 'true';
+            const dn = document.getElementById('setting-desktop');
+            if (dn) dn.checked = localStorage.getItem('desktop_notifications') === 'true';
+            const sf = document.getElementById('setting-severity');
+            if (sf && localStorage.getItem('severity_filter')) sf.value = localStorage.getItem('severity_filter');
+            const savedStrictness = localStorage.getItem('ai_strictness');
+            if (savedStrictness) {
+                const s = document.getElementById('ai-strictness');
+                const sv = document.getElementById('ai-strictness-val');
+                if (s && sv) { s.value = savedStrictness; sv.textContent = savedStrictness; }
+            }
+            const savedContext = localStorage.getItem('ai_context');
+            if (savedContext) { const c = document.getElementById('ai-context'); if (c) c.value = savedContext; }
+
+            // Load real models from backend
+            loadModelsFromBackend();
+        });
+
+        async function purgeDatabase() {
+            if (!confirm("WARNING: You are about to permanently delete all simulation history and threat logs from the database. This cannot be undone. Proceed?")) return;
+
+            try {
+                const res = await fetch('http://127.0.0.1:8000/evaluation/decisions/purge', { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast(`PURGED ${data.deleted_count} RECORDS`);
+                } else {
+                    alert("Failed to purge database: " + data.detail);
+                }
+            } catch (e) {
+                alert("Connection to backend failed.");
+            }
+        }
+
+        function requestNotificationPermission(checkbox) {
+            if (checkbox.checked) {
+                if (!("Notification" in window)) {
+                    alert("This browser does not support desktop notification");
+                    checkbox.checked = false;
+                } else if (Notification.permission === "granted") {
+                    showToast("NOTIFICATIONS ENABLED");
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(function (permission) {
+                        if (permission === "granted") {
+                            showToast("NOTIFICATIONS ENABLED");
+                        } else {
+                            checkbox.checked = false;
+                        }
+                    });
+                } else {
+                    alert("Please allow notifications in your browser settings.");
+                    checkbox.checked = false;
+                }
+            }
+        }
+        function selectAIModel(selectedBtn) {
+            const container = document.getElementById('ai-model-container');
+            if (!container) return;
+            const buttons = container.querySelectorAll('.ai-model-btn');
+            _activeModelId = selectedBtn.getAttribute('data-model-id') || selectedBtn.id.replace('model-', '');
+            buttons.forEach(btn => {
+                btn.className = 'ai-model-btn border border-outline-variant/30 bg-surface-container-lowest rounded-lg p-4 text-left hover:border-tertiary/50 transition-colors relative overflow-hidden';
+                const dot = btn.querySelector('.status-dot');
+                if (dot) dot.classList.add('hidden');
+                const name = btn.querySelector('.model-name');
+                if (name) {
+                    name.classList.remove('text-tertiary');
+                    name.classList.add('text-white');
+                }
+            });
+
+            // set active styling
+            selectedBtn.className = 'ai-model-btn border-2 border-tertiary bg-tertiary/10 rounded-lg p-4 text-left relative overflow-hidden';
+            const selDot = selectedBtn.querySelector('.status-dot');
+            if (selDot) selDot.classList.remove('hidden');
+            const selName = selectedBtn.querySelector('.model-name');
+            if (selName) {
+                selName.classList.remove('text-white');
+                selName.classList.add('text-tertiary');
+            }
+        }
+
+        function switchTab(tabId) {
+            currentActiveTab = tabId;
+            document.querySelectorAll('.settings-content').forEach(el => { el.classList.add('hidden'); });
+            document.querySelectorAll('.settings-tab').forEach(el => {
+                el.className = 'settings-tab w-full flex items-center gap-3 px-4 py-3.5 rounded-lg text-secondary/70 hover:bg-surface-bright/30 hover:text-white transition-all text-sm font-medium border-l-4 border-transparent';
+            });
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).className = 'settings-tab w-full flex items-center gap-3 px-4 py-3.5 rounded-lg bg-primary/10 text-primary border-l-4 border-primary transition-all text-sm font-bold shadow-[inset_4px_0_0_0_rgba(0,218,243,1)]';
+        }
+
+        let toastTimeout;
+        function showToast(msg) {
+            const toast = document.getElementById('toast-notification');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = msg;
+
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            }, 3000);
+        }
+
+        async function saveConfiguration() {
+            const _sess = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+            const saveBtn = (typeof event !== 'undefined' ? event.target : null) || document.querySelector('button[onclick*="saveConfiguration"]');
+            const originalBtnHtml = saveBtn ? saveBtn.innerHTML : '';
+            
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin" style="font-size:18px">sync</span> Synchronizing...';
+            }
+
+            try {
+                if (currentActiveTab === 'profile') {
+                    const newName = document.getElementById('operative-name').value.trim();
+                    const email = _sess.email;
+
+                    if (email && newName) {
+                        try {
+                            await fetch('http://127.0.0.1:8000/auth/update-profile', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ email, new_username: newName })
+                            });
+                        } catch (e) { }
+
+                        try {
+                            _sess.username = newName;
+                            sessionStorage.setItem('sentinel_user', JSON.stringify(_sess));
+                            ['nav-username', 'dd-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = newName; });
+                            const initials = newName.slice(0, 2).toUpperCase();
+                            ['nav-avatar', 'dd-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = initials; });
+                        } catch (e) { }
+                    }
+
+                    // Save Security tab settings to localStorage
+                    const strictCb = document.getElementById('strict-session');
+                    if (strictCb) localStorage.setItem('strict_session_timeout', strictCb.checked);
+
+                    showToast('CREDENTIALS UPDATED');
+                }
+                else if (currentActiveTab === 'ai') {
+                    // Save AI Core Tuning — use _activeModelId from dynamic cards
+                    if (_activeModelId) {
+                        localStorage.setItem('ai_primary_model', _activeModelId);
+                        
+                        // Trigger backend hot-swap
+                        console.log("[Sentinel] Switching model to:", _activeModelId);
+                        try {
+                            const res = await fetch('http://127.0.0.1:8000/evaluation/switch-model', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ provider: _activeModelId })
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                                showToast(`AI CORE OPTIMIZED: ${data.model}`);
+                                
+                                // DESKTOP NOTIFICATION
+                                if (Notification.permission === "granted" && localStorage.getItem('desktop_notifications') === 'true') {
+                                    new Notification("Sentinel AI Core", {
+                                        body: `LLM reasoning engine successfully switched to ${data.model}`,
+                                        icon: "https://img.icons8.com/color/512/artificial-intelligence.png"
+                                    });
+                                }
+                            } else {
+                                alert("Failed to switch backend model: " + (data.detail || "Unknown error"));
+                            }
+                        } catch (e) {
+                            console.error("Agent model switch failed", e);
+                            showToast('AI SAVED LOCALLY (BACKEND OFFLINE)');
+                        }
+                    }
+
+                    const aiStrictness = document.getElementById('ai-strictness');
+                    if (aiStrictness) localStorage.setItem('ai_strictness', aiStrictness.value);
+                    const aiContext = document.getElementById('ai-context');
+                    if (aiContext) localStorage.setItem('ai_context', aiContext.value);
+                }
+                else if (currentActiveTab === 'data') {
+                    const dr = document.getElementById('data-retention');
+                    if (dr) {
+                        localStorage.setItem('data_retention', dr.value);
+                        await applyRetentionPolicy(dr.value); // delete old DB records
+                    }
+                    showToast('RETENTION POLICY SAVED');
+                }
+                else if (currentActiveTab === 'alerts') {
+                    const aa = document.getElementById('setting-audio');
+                    if (aa) localStorage.setItem('audio_alerts', aa.checked);
+
+                    const dn = document.getElementById('setting-desktop');
+                    if (dn) localStorage.setItem('desktop_notifications', dn.checked);
+
+                    const sf = document.getElementById('setting-severity');
+                    if (sf) localStorage.setItem('severity_filter', sf.value);
+
+                    showToast('ALERT PREFERENCES SAVED');
+                }
+                else {
+                    showToast('ALL SYSTEMS OPTIMIZED');
+                }
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalBtnHtml;
+                }
+            }
+        }
+
+        async function changePassword() {
+            const currentPw = document.getElementById('current-password').value;
+            const newPw = document.getElementById('new-password').value;
+            const confirmPw = document.getElementById('confirm-password').value;
+
+            if (!currentPw || !newPw || !confirmPw) {
+                alert("Please fill all password fields.");
+                return;
+            }
+
+            if (newPw !== confirmPw) {
+                alert("New passwords do not match.");
+                return;
+            }
+
+            if (newPw.length < 6) {
+                alert("Password must be at least 6 characters.");
+                return;
+            }
+
+            // Grab email from session storage
+            let email = "";
+            try {
+                const sessionStr = sessionStorage.getItem('sentinel_user');
+                if (sessionStr) {
+                    const session = JSON.parse(sessionStr);
+                    email = session.email;
+                }
+            } catch (e) { }
+
+            if (!email) {
+                alert("You are not logged in properly. No email found in session.");
+                return;
+            }
+
+            try {
+                const res = await fetch('http://127.0.0.1:8000/api/auth/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        current_password: currentPw,
+                        new_password: newPw
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('PASSWORD SUCCESSFULLY UPDATED');
+                    document.getElementById('current-password').value = '';
+                    document.getElementById('new-password').value = '';
+                    document.getElementById('confirm-password').value = '';
+                } else {
+                    alert("Error: " + (data.detail || "Could not update password"));
+                }
+            } catch (err) {
+                alert("Network error: Could not reach backend.");
+            }
+        }
+    </script>
+
+
+    <script>
+
+        // ── GLOBAL SESSION POPULATION ─────────────────────────────────────────
+        const _GLOBAL_SESSION = JSON.parse(sessionStorage.getItem('sentinel_user') || '{}');
+        if (_GLOBAL_SESSION.username) {
+            ['nav-username', 'dd-name'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = _GLOBAL_SESSION.username; });
+            const ini = (_GLOBAL_SESSION.username || 'MA').slice(0, 2).toUpperCase();['nav-avatar', 'dd-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = ini; });
+        }
+        if (_GLOBAL_SESSION.email) { const el = document.getElementById('dd-email'); if (el) el.textContent = _GLOBAL_SESSION.email; }
+        if (_GLOBAL_SESSION.loginTime) {
+            const el = document.getElementById('dd-login-time');
+            if (el) el.textContent = 'Since ' + new Date(_GLOBAL_SESSION.loginTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function toggleUserMenu() {
+            const dd = document.getElementById('profile-dropdown');
+            if (dd) dd.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', e => {
+            const wrap = document.getElementById('user-menu-wrap');
+            const dd = document.getElementById('profile-dropdown');
+            if (wrap && dd && !wrap.contains(e.target)) dd.classList.add('hidden');
+        });
+
+        function signOut() {
+            sessionStorage.removeItem('sentinel_user');
+            window.location.href = 'login.html';
+        }
+
+        // ── STRICT SESSION TIMEOUT ────────────────────────────────────────────
+        let _inactivityTimer;
+        function resetInactivityTimer() {
+            clearTimeout(_inactivityTimer);
+            if (localStorage.getItem('strict_session_timeout') === 'true') {
+                _inactivityTimer = setTimeout(() => {
+                    alert("Session timed out due to 15 minutes of inactivity.");
+                    signOut();
+                }, 15 * 60 * 1000); // 15 mins
+            }
+        }
+        if (localStorage.getItem('strict_session_timeout') === 'true') {
+            ['mousemove', 'keypress', 'scroll', 'click'].forEach(evt => document.addEventListener(evt, resetInactivityTimer));
+            resetInactivityTimer();
+        }
+
+    </script>
+</body>
+
+</html>

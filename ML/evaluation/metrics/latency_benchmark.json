@@ -1,0 +1,26 @@
+{
+    "random_forest": {
+        "mean_ms": 93.6002,
+        "median_ms": 100.9101,
+        "p95_ms": 117.4918,
+        "p99_ms": 134.758,
+        "min_ms": 37.8788,
+        "max_ms": 269.1898
+    },
+    "xgboost": {
+        "mean_ms": 1.4115,
+        "median_ms": 1.1412,
+        "p95_ms": 2.4946,
+        "p99_ms": 3.0056,
+        "min_ms": 0.0,
+        "max_ms": 3.6922
+    },
+    "logistic_regression": {
+        "mean_ms": 0.1131,
+        "median_ms": 0.0,
+        "p95_ms": 1.0026,
+        "p99_ms": 1.1622,
+        "min_ms": 0.0,
+        "max_ms": 1.581
+    }
+}
